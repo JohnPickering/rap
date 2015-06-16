@@ -1,0 +1,20 @@
+Package: rap
+Title: Generates Risk Assessment Plot and reclassification metrics
+Version: 0.2
+Authors@R: "John W Pickering <John.Pickering@otago.ac.nz>[aut, cre], Zoltan H
+    Endre <z.endre@unsw.edu.au>[aut] and David Cairns
+    <D.A.Cairns@leeds.ac.uk>[aut]"
+Description: Calculates Net Reclassification Improvement (NRI) and Integrated
+    Discrimination Improvement (IDI) metrics and plots Risk Assessment Plots
+    (RAP). Includes category free and weighted NRI and uses bootstrapping to
+    create confidence intervals.  Also compares AUCs with the De Long method.
+Depends:
+    R (>= 3.1.0)
+Imports:
+    Hmisc,
+    caret,
+    pracma,
+    pROC
+License: GPL-3
+LazyData: true
+LazyLoad: true
