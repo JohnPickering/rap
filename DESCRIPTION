@@ -1,6 +1,6 @@
 Package: rap
 Title: Generates Risk Assessment Plot and reclassification metrics
-Version: 0.2
+Version: 0.3
 Authors@R: "John W Pickering <John.Pickering@otago.ac.nz>[aut, cre], Zoltan H
     Endre <z.endre@unsw.edu.au>[aut] and David Cairns
     <D.A.Cairns@leeds.ac.uk>[aut]"

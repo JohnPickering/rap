@@ -119,6 +119,8 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
   r <- range(x1, x2)
   if (r[1] < 0 || r[2] > 1)
     stop("x1 and x2 must be in [0,1]")
+  if(length(x1)!=length(x2))
+    stop("Reference (Null) and New (Alt) model vectors must be the same length")
   incidence<-sum(y)/n
   if (missing(t)) {t<-c(0, incidence,1) }
   a <- y == 1
@@ -200,6 +202,9 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
   idi.ev <- mean(improveSens)
   idi.ne <- mean(improveSpec)
   idi <- idi.ev + idi.ne
+  relidi <- 100*((sum(x2[a])/na - sum(x2[b])/nb)/(sum(x1[a])/na-sum(x1[b])/nb)-1) #relative IDI expressed as a percentage
+  se.relidi <-NA
+  z.relidi <- NA
   var.ev <- var(d[a])/na
   se.idi.ev <- sqrt(var.ev)
   z.idi.ev <- idi.ev/se.idi.ev
@@ -246,7 +251,7 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
               improveSens, improveSpec, 
               s1,s2,wnri,se.wnri,z.wnri,
               idi.ev, se.idi.ev, z.idi.ev, idi.ne, 
-              se.idi.ne, z.idi.ne, idi, se.idi, z.idi, is.x1, NA, is.x2, NA, 
+              se.idi.ne, z.idi.ne, idi, se.idi, z.idi,relidi, se.relidi, z.relidi, is.x1, NA, is.x2, NA, 
               ip.x1, NA, ip.x2, NA, auc.x1, se.auc.x1, auc.x2, se.auc.x2, 
               roc.test.x1.x2$p.value,incidence)
   names(output) <- c("n", "na", "nb", "pup.ev", "pup.ne", "pdown.ev", "pdown.ne", 
@@ -257,7 +262,8 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
                      "cfnri.ne", "se.cfnri.ne", "z.cfnri.ne", "improveSens", "improveSpec",
                      "s1","s2","wnri","se.wnri","z.wnri",
                      "idi.ev", "se.idi.ev", "z.idi.ev", "idi.ne", "se.idi.ne", 
-                     "z.idi.ne", "idi", "se.idi", "z.idi", "is.x1", "se.is.x1", 
+                     "z.idi.ne", "idi", "se.idi", "z.idi","relidi", "se.relidi", "z.relidi", 
+                     "is.x1", "se.is.x1",
                      "is.x2", "se.is.x2", "ip.x1", "se.ip.x1", "ip.x2", "se.ip.x2", 
                      "auc.x1", "se.auc.x1", "auc.x2", "se.auc.x2", 
                      "roc.test.x1.x2.pvalue","incidence")
@@ -289,6 +295,7 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
 #' \item{IDI events}{The IDI (Integrated Discrimination Improvement) with confidence interval for those with the event. Expressed as a fraction}
 #' \item{IDI non-events}{The IDI with confidence interval for those without the event. Expressed as a fraction}
 #' \item{IDI}{The sum of IDI events and IDI non-events}
+#' \item{relIDI}{The relative IDI}
 #' \item{IS(null model)}{The Integrated Sensitivity (area under the sensitivity-calculated risk curve) for the reference (null) model}
 #' \item{IS(alt model)}{The Integrated Sensitivity for the reference (alt) model. Note, the IDI events should be the difference between IS(alt model) and IS(null model)}
 #' \item{IP(null model)}{The Integrated 1-Specificity (area under the 1-specificity-calculated risk curve) for the reference (null) model}
@@ -316,6 +323,8 @@ statistics.raplot <- function(x1, x2, y,s1,s2,t) {
 #' Reference for the continuous (category free) NRI: Pencina, M. J., D'Agostino, R. B., & Steyerberg, E. W. (2011). Extensions of net reclassification improvement calculations to measure usefulness of new biomarkers. Statistics in Medicine, 30(1), 11–21. doi:10.1002/sim.4085
 #' Reference for the method of comparing AUCs: DeLong, E., DeLong, D., & Clarke-Pearson, D. (1988). Comparing the areas under 2 or more correlated receiver operating characteristic curves - a nonparametric approach. Biometrics, 44(3), 837–845.
 CI.raplot <- function(x1, x2, y, s1,s2, t, cis = c("asymptotic", "boot"), conf.level = 0.95, n.boot = 2000, dp = 4) {
+  if(length(x1)!=length(x2))
+    stop("Reference (Null) and New (Alt) model vectors must be the same length")
   if (missing(s1)){
     s1<-0
     s2<-0
@@ -351,7 +360,7 @@ CI.raplot <- function(x1, x2, y, s1,s2, t, cis = c("asymptotic", "boot"), conf.l
   # calculate cis and return 
   z <- abs(qnorm((1 - conf.level)/2))
   
-  results.matrix <- matrix(NA, 26, 2)
+  results.matrix <- matrix(NA, 27, 2)
   
   results.matrix[1, ] <- c("Total (n)", results["n"])
   results.matrix[2, ] <- c("Events (n)", results["na"])
@@ -364,7 +373,7 @@ CI.raplot <- function(x1, x2, y, s1,s2, t, cis = c("asymptotic", "boot"), conf.l
                                                  z * 100*results["se.cfnri.ev"], dp-2), ")", sep = ""))
   results.matrix[6, ] <- c("cfNRI non-events (%)", 
                            paste(round(100*results["cfnri.ne"], dp-2), " (",
-                                 round(100*results["cfnri.ne"] - z * 100*results["se.cfnri.ne"], dp)-2,
+                                 round(100*results["cfnri.ne"] - z * 100*results["se.cfnri.ne"], dp-2),
                                  " to ", round(100*results["cfnri.ne"] +  z * 100*results["se.cfnri.ne"], 
                                                dp-2), ")", sep = "")) 
   results.matrix[7, ] <- c("cfNRI (dimensionless)", 
@@ -381,8 +390,7 @@ CI.raplot <- function(x1, x2, y, s1,s2, t, cis = c("asymptotic", "boot"), conf.l
   results.matrix[10, ] <- c("NRI non-events (%)", 
                             paste(round(100*results["nri.ne"], dp-2), " (",
                                   round(100*results["nri.ne"] - z * 100*results["se.nri.ne"], dp-2),
-                                  " to ", round(100*results["nri.ne"] +  z * 100*results["se.nri.ne"], 
-                                                dp-2), ")", sep = "")) 
+                                  " to ", round(100*results["nri.ne"] +  z * 100*results["se.nri.ne"],  dp-2), ")", sep = "")) 
   results.matrix[11, ] <- c("NRI (dimensionless)", 
                             paste(round(100*results["nri"], dp-2), " (", 
                                   round(100*results["nri"] - z * 100*results["se.nri"], dp-2), 
@@ -410,39 +418,44 @@ CI.raplot <- function(x1, x2, y, s1,s2, t, cis = c("asymptotic", "boot"), conf.l
                                   round(results["idi"] - z * results["se.idi"], dp), 
                                   " to ", round(results["idi"] + z * results["se.idi"], 
                                                 dp), ")", sep = ""))
-  results.matrix[18, ] <- c("IS (null model)", 
+  results.matrix[18, ] <- c("Relative IDI (%)", 
+                            paste(round(results["relidi"], dp-2), " (", 
+                                  round(results["relidi"] - z * results["se.relidi"], dp-2), 
+                                  " to ", round(results["relidi"] + z * results["se.relidi"], 
+                                                dp-2), ")", sep = ""))
+  results.matrix[19, ] <- c("IS (null model)", 
                             paste(round(results["is.x1"], dp), " (", 
                                   round(results["is.x1"] - z * results["se.is.x1"], dp), 
                                   " to ", round(results["is.x1"] + z * results["se.is.x1"], 
                                                 dp), ")", sep = ""))
-  results.matrix[19, ] <- c("IS (alt model)", 
+  results.matrix[20, ] <- c("IS (alt model)", 
                             paste(round(results["is.x2"], dp), " (", 
                                   round(results["is.x2"] - z * results["se.is.x2"], dp), 
                                   " to ", round(results["is.x2"] + z * results["se.is.x2"], 
                                                 dp), ")", sep = ""))
-  results.matrix[20, ] <- c("IP (null model)", 
+  results.matrix[21, ] <- c("IP (null model)", 
                             paste(round(results["ip.x1"], dp), " (", 
                                   round(results["ip.x1"] - z * results["se.ip.x1"], dp), 
                                   " to ", round(results["ip.x1"] + z *  results["se.ip.x1"], 
                                                 dp), ")", sep = ""))
-  results.matrix[21, ] <- c("IP (alt model)", 
+  results.matrix[22, ] <- c("IP (alt model)", 
                             paste(round(results["ip.x2"], dp), " (", 
                                   round(results["ip.x2"] - z * results["se.ip.x2"], dp), 
                                   " to ", round(results["ip.x2"] + z * results["se.ip.x2"], 
                                                 dp), ")", sep = ""))
-  results.matrix[22, ] <- c("AUC","-------------------------")
-  results.matrix[23, ] <- c("AUC (null model)", 
+  results.matrix[23, ] <- c("AUC","-------------------------")
+  results.matrix[24, ] <- c("AUC (null model)", 
                             paste(round(results["auc.x1"], dp), " (", 
                                   round(results["auc.x1"] - z * results["se.auc.x1"], dp), 
                                   " to ", round(results["auc.x1"] + z * results["se.auc.x1"], 
                                                 dp), ")", sep = ""))
-  results.matrix[24, ] <- c("AUC (alt model)", 
+  results.matrix[25, ] <- c("AUC (alt model)", 
                             paste(round(results["auc.x2"], dp), " (", 
                                   round(results["auc.x2"] - z * results["se.auc.x2"], dp), 
                                   " to ", round(results["auc.x2"] +  z * results["se.auc.x2"], 
                                                 dp), ")", sep = ""))
-  results.matrix[25, ] <- c("difference (P)", round(results["roc.test.x1.x2.pvalue"], dp))
-  results.matrix[26, ] <- c("Incidence", round(results["incidence"], dp))
+  results.matrix[26, ] <- c("difference (P)", round(results["roc.test.x1.x2.pvalue"], dp))
+  results.matrix[27, ] <- c("Incidence", round(results["incidence"], dp))
   
   return(results.matrix)
 }
@@ -471,7 +484,8 @@ statistics.classNRI <- function(c1, c2, y,s1,s2) {
   u <- sort(unique(y))
   if (length(u) != 2 || u[1] != 0 || u[2] != 1)
     stop("y must have two values: 0 and 1")
-  
+  if(dim(c1)[1]!=dim(c2)[1])
+    stop("Reference (Null) and New (Alt) model vectors must be the same length")
   incidence<-sum(y)/n
   
   a <- y == 1
@@ -562,7 +576,8 @@ CI.classNRI <- function(c1, c2, y, s1,s2, cis = c("asymptotic", "boot"), conf.le
     s1<-0
     s2<-0
   }
-  
+  if(length(c1)!=length(c2))
+    stop("Reference (Null) and New (Alt) model vectors must be the same length") 
   results <- statistics.classNRI(c1, c2,y,s1,s2)  
   
   if (cis == "boot") {

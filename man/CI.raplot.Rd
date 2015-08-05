@@ -40,6 +40,7 @@ A matrix is returned with the following items:
 \item{IDI events}{The IDI (Integrated Discrimination Improvement) with confidence interval for those with the event. Expressed as a fraction}
 \item{IDI non-events}{The IDI with confidence interval for those without the event. Expressed as a fraction}
 \item{IDI}{The sum of IDI events and IDI non-events}
+\item{relIDI}{The relative IDI}
 \item{IS(null model)}{The Integrated Sensitivity (area under the sensitivity-calculated risk curve) for the reference (null) model}
 \item{IS(alt model)}{The Integrated Sensitivity for the reference (alt) model. Note, the IDI events should be the difference between IS(alt model) and IS(null model)}
 \item{IP(null model)}{The Integrated 1-Specificity (area under the 1-specificity-calculated risk curve) for the reference (null) model}
