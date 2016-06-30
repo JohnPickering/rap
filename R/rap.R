@@ -484,7 +484,7 @@ statistics.classNRI <- function(c1, c2, y,s1,s2) {
   u <- sort(unique(y))
   if (length(u) != 2 || u[1] != 0 || u[2] != 1)
     stop("y must have two values: 0 and 1")
-  if(dim(c1)[1]!=dim(c2)[1])
+  if(length(c1)!=length(c2))
     stop("Reference (Null) and New (Alt) model vectors must be the same length")
   incidence<-sum(y)/n
   
