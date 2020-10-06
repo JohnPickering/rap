@@ -380,6 +380,9 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
 #' @param  t The risk threshold(s) for groups. eg t<-c(0,0.1,1) is a two group scenario with a threshold of 0.1 & t<-c(0,0.1,0.3,1)  is a three group scenario with thresholds at 0.1 and 0.3. Nb. If no t is provided it defaults to a single threshold at the prevalence of the cohort.  
 #' @return A matrix of metrics for use within CI.raplot
+#' @import pROC
+#' @import magrittr
+#' @import dplyr
 #' @export
 #' 
 statistics.raplot <- function(x1, x2, y,  t = NULL) {   
