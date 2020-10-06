@@ -10,9 +10,9 @@
 #' @export
 ggrap <- function(x1, x2, y) {
   
-  requireNamespace(ggplot2)
-  requireNamespace(pROC)
-  requireNamespace(dplyr)  
+  require(ggplot2)
+  require(pROC)
+  require(dplyr)  
   
   if (class(x1)[1] == "glm") {
     y = x1$y
@@ -23,7 +23,7 @@ ggrap <- function(x1, x2, y) {
     x2 = predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     x1 = predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
@@ -32,7 +32,7 @@ ggrap <- function(x1, x2, y) {
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -100,9 +100,9 @@ ggrap <- function(x1, x2, y) {
 #'
 ggdecision <- function(x1, x2, y) {
   
-  requireNamespace(ggplot2)
-  requireNamespace(pROC)
-  requireNamespace(dplyr)  
+  require(ggplot2)
+  require(pROC)
+  require(dplyr)  
   
   if (class(x1)[1] == "glm") {
     y = x1$y
@@ -113,7 +113,7 @@ ggdecision <- function(x1, x2, y) {
     x2 = predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     x1 = predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
@@ -122,7 +122,7 @@ ggdecision <- function(x1, x2, y) {
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -247,10 +247,10 @@ ggdecision <- function(x1, x2, y) {
 #' @export
 ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_type = c("interval","number","width"), include_margin = FALSE) {
   
-  requireNamespace(ggplot2)
-  requireNamespace(dplyr)
-  requireNamespace(rms)
-  requireNamespace(stats)
+  require(ggplot2)
+  require(dplyr)
+  require(rms)
+  require(stats)
   
   if (class(x1)[1] == "glm") {
     y = x1$y
@@ -261,7 +261,7 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
     x2 = predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     x1 = predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
@@ -270,7 +270,7 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -397,8 +397,8 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
 #' @export
 #' 
 statistics.raplot <- function(x1, x2, y,  t = NULL) {   
-  requireNamespace(dplyr)
-  requireNamespace(pROC)
+  require(dplyr)
+  require(pROC)
 
   
   df <- data.frame(x1 = x1, x2 = x2, event = y) # y = 1 for the event, 0 for not the event.  
@@ -532,7 +532,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
 #' @export
 extractCI <- function(results.boot, conf.level, n.boot, dp){
   
-  requireNamespace(dplyr)
+  require(dplyr)
   
   n_vars = length(results.boot[[1]])
   results.df <- data.frame(matrix(nrow = n.boot, ncol = n_vars))   
@@ -571,7 +571,7 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
 #' @export
 extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
   
-  requireNamespace(dplyr)
+  require(dplyr)
   
   n_vars = sum(unlist(lapply( results.boot[[1]], class)) == "numeric" | unlist(lapply( results.boot[[1]], class)) == "integer" ) #because we don't calculate CIs for the confusion matrices
   results.df <- data.frame(matrix(nrow = n.boot, ncol = n_vars))   
@@ -653,7 +653,7 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
 #' @references  Pencina, M. J., D'Agostino, R. B., & Vasan, R. S. (2008). Evaluating the added predictive ability of a new marker: From area under the ROC curve to reclassification and beyond. Statistics in Medicine, 27(2), 157–172. doi:10.1002/sim.2929
 CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 2000, dp = 3) {
   
-  requireNamespace("dplyr")
+  require("dplyr")
   
   if (class(x1)[1] == "glm") {
     y = x1$y # must come first
@@ -664,7 +664,7 @@ CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 
     x2 = predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     x1 = predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
@@ -673,7 +673,7 @@ CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    requireNamespace("rms")
+    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -757,7 +757,7 @@ meta.rap = function(l) {
 #' @export
 statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {    
   
-  requireNamespace(dplyr)
+  require(dplyr)
   
   if (!is.factor(c1) | !is.factor(c2))    
     stop("Risk classes must be a factor (in the order of low to high risk)")
