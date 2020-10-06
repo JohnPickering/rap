@@ -652,6 +652,9 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
 #'}
 #' @references  Pencina, M. J., D'Agostino, R. B., & Vasan, R. S. (2008). Evaluating the added predictive ability of a new marker: From area under the ROC curve to reclassification and beyond. Statistics in Medicine, 27(2), 157–172. doi:10.1002/sim.2929
 CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 2000, dp = 3) {
+  
+  requireNamespace("dplyr")
+  
   if (class(x1)[1] == "glm") {
     y = x1$y # must come first
     x1 = predict(x1, type = "response")
