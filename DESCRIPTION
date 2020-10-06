@@ -10,7 +10,12 @@ Imports:
     rms,
     dplyr,
     ggplot2,
-    pROC
+    pROC,
+    stats,
+    tidyr,
+    magrittr,
+    forcats,
+    pracma
 License: GPL-3
 LazyData: true
 LazyLoad: true

@@ -7,24 +7,20 @@
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
 #' @return a ggplot 
 #' @references The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
+#' @import ggplot2
 #' @export
 ggrap <- function(x1, x2, y) {
   
-  require(ggplot2)
-  require(pROC)
-  require(dplyr)  
-  
   if (class(x1)[1] == "glm") {
     y = x1$y
-    x1 = predict(x1, type = "response")
+    x1 = stats::predict(x1, type = "response")
     data_type = "glm"
   }
   if (class(x2)[1] == "glm") {
-    x2 = predict(x2, type = "response")
+    x2 = stats::predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    require("rms")
-    x1 = predict(x1, type = "fitted")
+    x1 = stats::predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -32,11 +28,10 @@ ggrap <- function(x1, x2, y) {
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
-    x2 = predict(x2, type = "fitted")
+    x2 = stats::predict(x2, type = "fitted")
   }
   
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
@@ -96,25 +91,21 @@ ggrap <- function(x1, x2, y) {
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
 #' @return a ggplot 
 #' @references Vickers AJ, van Calster B, Steyerberg EW. A simple, step-by-step guide to interpreting decision curve analysis. Diagn Progn Res 2019;3(1):18. 2. Zhang Z, Rousson V, Lee W-C, et al. Decision curve analysis: a technical note. Ann Transl Med 2018;6(15):308–308. 
+#' @import ggplot2
 #' @export
 #'
 ggdecision <- function(x1, x2, y) {
-  
-  require(ggplot2)
-  require(pROC)
-  require(dplyr)  
-  
+
   if (class(x1)[1] == "glm") {
     y = x1$y
-    x1 = predict(x1, type = "response")
+    x1 = stats::predict(x1, type = "response")
     data_type = "glm"
   }
   if (class(x2)[1] == "glm") {
-    x2 = predict(x2, type = "response")
+    x2 = stats::predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    require("rms")
-    x1 = predict(x1, type = "fitted")
+    x1 = stats::predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -122,11 +113,10 @@ ggdecision <- function(x1, x2, y) {
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
-    x2 = predict(x2, type = "fitted")
+    x2 = stats::predict(x2, type = "fitted")
   }
   
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
@@ -215,7 +205,7 @@ ggdecision <- function(x1, x2, y) {
 
 #' The Calibration plot
 #' 
-#' ggcalibrate plots the predicted events against the actual event rate
+#' ggcalibrate plots the stats::predicted events against the actual event rate
 #' 
 #' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package) or alculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1
 #' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
@@ -244,25 +234,22 @@ ggdecision <- function(x1, x2, y) {
 #'#e.g.
 #'output <- ggcalibrate(x1, x2, y, models = "both", n_cut = 10, cut_type = "number") 
 #'}
+#' @import forcats
+#' @import ggplot2
+#' @importFrom pracma trapz
 #' @export
 ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_type = c("interval","number","width"), include_margin = FALSE) {
   
-  require(ggplot2)
-  require(dplyr)
-  require(rms)
-  require(stats)
-  
   if (class(x1)[1] == "glm") {
     y = x1$y
-    x1 = predict(x1, type = "response")
+    x1 = stats::predict(x1, type = "response")
     data_type = "glm"
   }
   if (class(x2)[1] == "glm") {
-    x2 = predict(x2, type = "response")
+    x2 = stats::predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    require("rms")
-    x1 = predict(x1, type = "fitted")
+    x1 = stats::predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -270,11 +257,10 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
-    x2 = predict(x2, type = "fitted")
+    x2 = stats::predict(x2, type = "fitted")
   }
   
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
@@ -397,10 +383,7 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
 #' @export
 #' 
 statistics.raplot <- function(x1, x2, y,  t = NULL) {   
-  require(dplyr)
-  require(pROC)
-
-  
+ 
   df <- data.frame(x1 = x1, x2 = x2, event = y) # y = 1 for the event, 0 for not the event.  
   
   #Remove rows with missing data
@@ -489,8 +472,8 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
     group_by(Model) %>% 
     arrange(Prediction) %>% 
     summarise(
-      IS = trapz(x = c(Prediction), y = c(sens)),  
-      IP = trapz(x = c(Prediction), y = 1 - spec) )
+      IS = pracma::trapz(x = c(Prediction), y = c(sens)),  
+      IP = pracma::trapz(x = c(Prediction), y = 1 - spec) )
   
   # Output
   output <- list(n = n, 
@@ -529,10 +512,10 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
 #' @param n.boot The number of bootstrapped samples
 #' @param dp the number of decimal places to report the point estimate and confidence interval
 #' @return A two column matrix with the metric name and statistic with a confidence interval
+#' @import magrittr
+#' @import dplyr
 #' @export
 extractCI <- function(results.boot, conf.level, n.boot, dp){
-  
-  require(dplyr)
   
   n_vars = length(results.boot[[1]])
   results.df <- data.frame(matrix(nrow = n.boot, ncol = n_vars))   
@@ -551,7 +534,8 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
   
   results.matrix <- as_tibble(t(bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)))
   
-  results.matrix$metric = names(results.boot[[1]]) 
+  results.matrix$metric <- names(results.boot[[1]]) 
+  
   results.matrix <- results.matrix %>% 
     mutate(statistics = paste0( V1, " (CI: ",V2, " to ", V3,")" )) %>% 
     select(metric, statistics)
@@ -568,10 +552,10 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
 #' @param n.boot The number of bootstrapped samples
 #' @param dp the number of decimal places to report the point estimate and confidence interval
 #' @return A two column matrix with the metric name and statistic with a confidence interval
+#' @import magrittr
+#' @import dplyr
 #' @export
 extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
-  
-  require(dplyr)
   
   n_vars = sum(unlist(lapply( results.boot[[1]], class)) == "numeric" | unlist(lapply( results.boot[[1]], class)) == "integer" ) #because we don't calculate CIs for the confusion matrices
   results.df <- data.frame(matrix(nrow = n.boot, ncol = n_vars))   
@@ -591,7 +575,7 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
   
   results.matrix <- as_tibble(t(bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)))
   
-  results.matrix$metric = names(temp)
+  results.matrix$metric <- names(temp)
   results.matrix <- results.matrix %>% 
     mutate(statistics = paste0( V1, " (CI: ",V2, " to ", V3,")" )) %>% 
     select(metric, statistics)
@@ -650,22 +634,19 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
 #'#e.g.
 #'output<-CI.raplot(x1, x2, y, t, conf.level = 0.95, n.boot = 5, dp = 2) 
 #'}
-#' @references  Pencina, M. J., D'Agostino, R. B., & Vasan, R. S. (2008). Evaluating the added predictive ability of a new marker: From area under the ROC curve to reclassification and beyond. Statistics in Medicine, 27(2), 157–172. doi:10.1002/sim.2929
+#' @references  Pencina, M. J., D'Agostino, R. B., & Vasan, R. S. (2008). Evaluating the added stats::predictive ability of a new marker: From area under the ROC curve to reclassification and beyond. Statistics in Medicine, 27(2), 157–172. doi:10.1002/sim.2929
 CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 2000, dp = 3) {
-  
-  require("dplyr")
   
   if (class(x1)[1] == "glm") {
     y = x1$y # must come first
-    x1 = predict(x1, type = "response")
+    x1 = stats::predict(x1, type = "response")
     data_type = "glm"
   }
   if (class(x2)[1] == "glm") {
-    x2 = predict(x2, type = "response")
+    x2 = stats::predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    require("rms")
-    x1 = predict(x1, type = "fitted")
+    x1 = stats::predict(x1, type = "fitted")
     if (length(x1$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
@@ -673,11 +654,10 @@ CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 
     data_type = "lrm"
   }
   if (class(x2)[1] == "lrm") {
-    require("rms")
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
-    x2 = predict(x2, type = "fitted")
+    x2 = stats::predict(x2, type = "fitted")
   }
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
     data_type = "User supplied"
@@ -756,8 +736,6 @@ meta.rap = function(l) {
 #'}
 #' @export
 statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {    
-  
-  require(dplyr)
   
   if (!is.factor(c1) | !is.factor(c2))    
     stop("Risk classes must be a factor (in the order of low to high risk)")

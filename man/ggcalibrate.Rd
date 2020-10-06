@@ -43,7 +43,7 @@ ggcalibrate(
 a list of one or two ggplots
 }
 \description{
-ggcalibrate plots the predicted events against the actual event rate
+ggcalibrate plots the stats::predicted events against the actual event rate
 }
 \examples{
 \dontrun{
