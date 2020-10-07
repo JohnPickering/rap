@@ -421,8 +421,8 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   auc.difference = auc.x2 - auc.x1
   
   df <- df %>% 
-    mutate(risk.class.x1 = cut2(x1,t)) %>% #risk groups based on thresholds
-    mutate(risk.class.x2 = cut2(x2,t)) %>% 
+    mutate(risk.class.x1 = Hmisc::cut2(x1,t)) %>% #risk groups based on thresholds
+    mutate(risk.class.x2 = Hmisc::cut2(x2,t)) %>% 
     mutate(difference = x2 - x1)  %>%   # difference in probabilities
     mutate(mse_x1 = (event - x1)^2) %>% # mean squared errors of the baseline model
     mutate(mse_x2 = (event - x2)^2)  
@@ -437,7 +437,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
     group_by(event) %>% 
     mutate(up = ifelse(as.numeric(risk.class.x2) > as.numeric(risk.class.x1),1,0))  %>% 
     mutate(down = ifelse(as.numeric(risk.class.x2) < as.numeric(risk.class.x1),1,0)) %>% 
-    summarise(
+    dplyr::summarise(
       n = n(),
       n_up = sum(up),
       n_down = sum(down),
@@ -449,13 +449,13 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   #IDI
   df_IDI <- df %>% 
     group_by(event) %>%  # only report for those with and without the disease seperately
-    summarise(IDI = mean(difference, na.rm = TRUE)) %>% # the IDI is the mean change in Prediction
+    dplyr::summarise(IDI = mean(difference, na.rm = TRUE)) %>% # the IDI is the mean change in Prediction
     ungroup() %>% 
     mutate(IDI = ifelse(event == 0, -IDI, IDI)) # for the non-event convert this so that a positive mean change means the move in the right direction
   
   #Brier
   df_Brier <- df %>% 
-    summarise(
+    dplyr::summarise(
       brier_baseline = mean(mse_x1),
       brier_new = mean(mse_x2),
       brier_skill = 100 * (brier_baseline - brier_new)/brier_baseline
@@ -474,7 +474,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   df_model_Istats <- df_model %>% 
     group_by(Model) %>% 
     arrange(Prediction) %>% 
-    summarise(
+    dplyr::summarise(
       IS = pracma::trapz(x = c(Prediction), y = c(sens)),  
       IP = pracma::trapz(x = c(Prediction), y = 1 - spec) )
   
