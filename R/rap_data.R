@@ -4,9 +4,9 @@
 #' 
 #' @format data frame with 3 columns
 #' \describe{
-#'   \item{ref_class}{The class (in this case as an interger) of the baseline model}
-#'   \item{new_class}{The class (in this case as an interger) of the new model}
-#'   \item{outcome}{The outcome of interest (0 or 1)}
+#'   \item{ref_class}{The class of the baseline model. Must be a factor}
+#'   \item{new_class}{The class  of the new model. Must be a factor}
+#'   \item{Outcome}{The outcome of interest (Low or High). Must be a factor}
 #' }
 "data_class"
 

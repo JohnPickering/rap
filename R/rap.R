@@ -8,6 +8,8 @@
 #' @return a ggplot 
 #' @references The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
 #' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @import dplyr
 #' @export
 ggrap <- function(x1, x2, y) {
   
@@ -92,6 +94,8 @@ ggrap <- function(x1, x2, y) {
 #' @return a ggplot 
 #' @references Vickers AJ, van Calster B, Steyerberg EW. A simple, step-by-step guide to interpreting decision curve analysis. Diagn Progn Res 2019;3(1):18. 2. Zhang Z, Rousson V, Lee W-C, et al. Decision curve analysis: a technical note. Ann Transl Med 2018;6(15):308–308. 
 #' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @import dplyr
 #' @export
 #'
 ggdecision <- function(x1, x2, y) {
@@ -236,6 +240,8 @@ ggdecision <- function(x1, x2, y) {
 #'}
 #' @import forcats
 #' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @import dplyr
 #' @importFrom pracma trapz
 #' @export
 ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_type = c("interval","number","width"), include_margin = FALSE) {
@@ -860,7 +866,6 @@ CI.classNRI <- function(c1, c2, y, s1 = NULL, s2 = NULL,  conf.level = 0.95, n.b
   results.boot <- list()
   
   for (i in 1:n.boot) {
-    print(i)
     boot.index <- sample(length(y), replace = TRUE)
     risk.model1.boot <- c1[boot.index]
     risk.model2.boot <- c2[boot.index]
