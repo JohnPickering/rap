@@ -8,7 +8,7 @@
 #' @return a ggplot 
 #' @references The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
 #' @import ggplot2
-#' @importFrom tidyr pivot_longer
+#' @import tidyr 
 #' @import dplyr
 #' @export
 ggrap <- function(x1, x2, y) {
@@ -50,7 +50,7 @@ ggrap <- function(x1, x2, y) {
   df$ID = seq(1,nrow(df),1)
   
   df_long <- df %>% 
-    pivot_longer(cols = c(Baseline,New), values_to = "Probabilities", names_to = "Model") %>% 
+    tidyr::pivot_longer(cols = c(Baseline,New), values_to = "Probabilities", names_to = "Model") %>% 
     group_by(Model) %>% 
     arrange(Model, Probabilities) %>% 
     group_by(Model,Probabilities) %>% 
@@ -74,7 +74,7 @@ ggrap <- function(x1, x2, y) {
   
   df_g <- df_long_av %>% 
     select(Probabilities, Sensitivity, `1-Specificity`, Model, ID_list) %>%  
-    pivot_longer(cols = c(Sensitivity, `1-Specificity`), values_to = "Metric", names_to = "Metric name")
+    tidyr::pivot_longer(cols = c(Sensitivity, `1-Specificity`), values_to = "Metric", names_to = "Metric name")
   
   g <- ggplot(df_g, aes(x = Probabilities, y = Metric, colour = `Metric name`, linetype = Model )) +
     geom_line(size = 0.75) +
@@ -94,7 +94,7 @@ ggrap <- function(x1, x2, y) {
 #' @return a ggplot 
 #' @references Vickers AJ, van Calster B, Steyerberg EW. A simple, step-by-step guide to interpreting decision curve analysis. Diagn Progn Res 2019;3(1):18. 2. Zhang Z, Rousson V, Lee W-C, et al. Decision curve analysis: a technical note. Ann Transl Med 2018;6(15):308–308. 
 #' @import ggplot2
-#' @importFrom tidyr pivot_longer
+#' @import tidyr
 #' @import dplyr
 #' @export
 #'
@@ -194,7 +194,7 @@ ggdecision <- function(x1, x2, y) {
   benefit_all_none <- benefit %>% 
     select(Prediction, all) %>% 
     mutate(none = 0)  %>% 
-    pivot_longer(cols = c("all", "none"), names_to = "Extreme models", values_to = "extremes") %>% 
+    tidyr::pivot_longer(cols = c("all", "none"), names_to = "Extreme models", values_to = "extremes") %>% 
     arrange(`Extreme models`)
   
   g <- ggplot() + 
@@ -240,7 +240,7 @@ ggdecision <- function(x1, x2, y) {
 #'}
 #' @import forcats
 #' @import ggplot2
-#' @importFrom tidyr pivot_longer
+#' @import tidyr
 #' @import dplyr
 #' @importFrom pracma trapz
 #' @export
@@ -291,7 +291,7 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
   # Calibration
   
   df_long <- df %>% 
-    pivot_longer(cols = c(Baseline,New), values_to = "prediction", names_to = "Model") %>% 
+    tidyr::pivot_longer(cols = c(Baseline,New), values_to = "prediction", names_to = "Model") %>% 
     select(Model,Event, prediction) %>% # or whatever your outcome and predictions are
     mutate(prediction = 100 * as.numeric(prediction)) %>%  # If prediciton is in the 0-1 range I prefer it in the 0-100 range
     filter(!is.na(prediction)) 
@@ -387,8 +387,8 @@ ggcalibrate <- function(x1, x2, y, models = c("both","x1","x2"), n_cut = 5, cut_
 #' @param  t The risk threshold(s) for groups. eg t<-c(0,0.1,1) is a two group scenario with a threshold of 0.1 & t<-c(0,0.1,0.3,1)  is a three group scenario with thresholds at 0.1 and 0.3. Nb. If no t is provided it defaults to a single threshold at the prevalence of the cohort.  
 #' @return A matrix of metrics for use within CI.raplot
 #' @import pROC
-#' @import magrittr
 #' @import dplyr
+#' @import tidyr
 #' @export
 #' 
 statistics.raplot <- function(x1, x2, y,  t = NULL) {   
@@ -521,7 +521,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
 #' @param n.boot The number of bootstrapped samples
 #' @param dp the number of decimal places to report the point estimate and confidence interval
 #' @return A two column matrix with the metric name and statistic with a confidence interval
-#' @import magrittr
+#' @import tidyr
 #' @import dplyr
 #' @export
 extractCI <- function(results.boot, conf.level, n.boot, dp){
@@ -561,7 +561,7 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
 #' @param n.boot The number of bootstrapped samples
 #' @param dp the number of decimal places to report the point estimate and confidence interval
 #' @return A two column matrix with the metric name and statistic with a confidence interval
-#' @import magrittr
+#' @import tidyr
 #' @import dplyr
 #' @export
 extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){

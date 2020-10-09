@@ -13,8 +13,7 @@ Imports:
     ggplot2,
     pROC,
     stats,
-    tidyr,
-    magrittr,
+    tidyr, 
     forcats,
     pracma
 License: GPL-3
