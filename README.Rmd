@@ -28,7 +28,7 @@ You can install the development version or rap from [GitHub](https://github.com/
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("JohnPickering/risk-assessment-plot-package")
+devtools::install_github("JohnPickering/rap")
 ```
 
 ## History and versions
@@ -47,7 +47,7 @@ Finally, the output from the main functions CI.raplot, and Ci.classNRI are lists
 
 This is a basic example for assessing the difference between two logistic regression models:
 
-```{r example1, warning = FALSE}
+```{r example1, warnings = FALSE}
 library(rap)
 ## basic example code
 
@@ -55,7 +55,8 @@ baseline_risk <- data_risk$baseline # or the glm model itself
 new_risk <- data_risk$new # or the glm model itself
 outcome <- data_risk$outcome
 
-assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
+assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
+                        n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  
@@ -101,7 +102,7 @@ baseline_class <- data_class$base_class
 new_class <- data_class$new_class
 outcome_class <- data_class$Outcome
 
-#class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome_class, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
+class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome_class, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  

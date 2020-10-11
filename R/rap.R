@@ -760,7 +760,7 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
   
   u <- sort(unique(df$event))
   if (length(u) != 2 || u[1] != 0 || u[2] != 1)
-    stop("Event must have two values: 0 and 1")
+    stop("Outcome/Event must have two values: 0 and 1")
   
   n <- nrow(df)
   n_event = sum(df$event)
