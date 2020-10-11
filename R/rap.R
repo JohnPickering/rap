@@ -144,7 +144,7 @@ ggdecision <- function(x1, x2, y) {
   
   # Net Benefit for Decision Curves
   benefit.1 <- df %>% 
-    mutate(Prediction = x1) %>% 
+    mutate(Prediction = Baseline) %>% 
     group_by(Prediction) %>% 
     summarise(n_ev = sum(Event == 1),
               n_nonev = sum(Event == 0)) %>% 
@@ -167,7 +167,7 @@ ggdecision <- function(x1, x2, y) {
     )
   
   benefit.2 <- df %>% 
-    mutate(Prediction = x2) %>% 
+    mutate(Prediction = New) %>% 
     group_by(Prediction) %>% 
     summarise(n_ev = sum(Event == 1),
               n_nonev = sum(Event == 0)) %>% 
@@ -746,8 +746,8 @@ meta.rap = function(l) {
 #' @export
 statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {    
   
-  if (!is.factor(c1) | !is.factor(c2))    
-    stop("Risk classes must be a factor (in the order of low to high risk)")
+  if (!is.factor(c1)) {c1 <- as.factor(c1) }
+  if (!is.factor(c2)) {c1 <- as.factor(c2) }
   
   df <- data.frame(c1 = c1, c2 = c2, event = y)
   
@@ -857,8 +857,9 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
 #' @return A matrix of metrics
 #' @export
 CI.classNRI <- function(c1, c2, y, s1 = NULL, s2 = NULL,  conf.level = 0.95, n.boot = 1000, dp = 3) {
-  if (!is.factor(c1) | !is.factor(c2))    
-    stop("Risk classes must be a factor (in the order of low to high risk)")
+  
+  if (!is.factor(c1)) {c1 <- as.factor(c1) }
+  if (!is.factor(c2)) {c1 <- as.factor(c2) }
   
   results <- statistics.classNRI(c1, c2,y,s1,s2)  
   
