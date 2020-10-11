@@ -13,7 +13,11 @@ Imports:
     ggplot2,
     pROC,
     stats,
+<<<<<<< HEAD
     tidyr, 
+=======
+    tidyr,
+>>>>>>> fb6e9d9d5920c357f1367ab8dbec16ece150d943
     forcats,
     pracma
 License: GPL-3
