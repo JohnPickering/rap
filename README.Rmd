@@ -47,7 +47,7 @@ Finally, the output from the main functions CI.raplot, and Ci.classNRI are lists
 
 This is a basic example for assessing the difference between two logistic regression models:
 
-```{r example1}
+```{r example1, warning = FALSE}
 library(rap)
 ## basic example code
 
@@ -72,20 +72,20 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome, n.boot =
 ## Graphical assessments
 
 ### The Risk Assessment Plot
-```{r ggrap}
-#ggrap(x1 = baseline_risk, x2 = new_risk, y = outcome)
+```{r ggrap, warning = FALSE}
+ggrap(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
 ### The calibration curve
-```{r ggcalibrate}
-#ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
+```{r ggcalibrate, warning = FALSE}
+ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
 ### The decision curve
-```{r ggdecision}
-#ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
+```{r ggdecision, warning = FALSE}
+ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
@@ -94,24 +94,24 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome, n.boot =
 
 This is a basic example for assessing the difference in the results of reclassification:
 
-```{r example2}
+```{r example2, eval = FALSE}
 ## basic example code
 
 baseline_class <- data_class$base_class
 new_class <- data_class$new_class
 outcome_class <- data_class$Outcome
 
-class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome_class, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
+#class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome_class, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  
-(class_assessment$meta_data)
+#(class_assessment$meta_data)
 
 ## exact point estimates and confusion matrices
-(class_assessment$Metrics)
+#(class_assessment$Metrics)
 
 ## bootstrap derived metrics with confidence intervals  
-(class_assessment$Summary_metrics)
+#(class_assessment$Summary_metrics)
 
 ```
 
