@@ -154,16 +154,16 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 #> # A tibble: 22 x 2
 #>    metric            statistics                
 #>    <chr>             <chr>                     
-#>  1 n                 432.5 (CI: 426.9 to 437.1)
-#>  2 n_event           82.5 (CI: 71.43 to 98.72) 
-#>  3 n_non_event       349 (CI: 333.27 to 362.57)
-#>  4 Prevalence        0.19 (CI: 0.16 to 0.23)   
-#>  5 NRI_up_event      20 (CI: 10.43 to 31.3)    
-#>  6 NRI_up_nonevent   20 (CI: 12.48 to 28)      
-#>  7 NRI_down_event    10 (CI: 5 to 18)          
-#>  8 NRI_down_nonevent 76.5 (CI: 60.95 to 105.87)
-#>  9 NRI_event         0.09 (CI: -0.03 to 0.19)  
-#> 10 NRI_nonevent      0.16 (CI: 0.11 to 0.23)   
+#>  1 n                 432 (CI: 428.95 to 436)   
+#>  2 n_event           84.5 (CI: 72.85 to 103)   
+#>  3 n_non_event       350 (CI: 327.48 to 356.57)
+#>  4 Prevalence        0.19 (CI: 0.17 to 0.24)   
+#>  5 NRI_up_event      22.5 (CI: 12.95 to 31.62) 
+#>  6 NRI_up_nonevent   20 (CI: 12.48 to 30)      
+#>  7 NRI_down_event    12 (CI: 5.48 to 20.57)    
+#>  8 NRI_down_nonevent 81 (CI: 52.7 to 106.3)    
+#>  9 NRI_event         0.12 (CI: 0 to 0.22)      
+#> 10 NRI_nonevent      0.18 (CI: 0.1 to 0.23)    
 #> # … with 12 more rows
 ```
 
