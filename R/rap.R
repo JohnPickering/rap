@@ -755,7 +755,7 @@ meta.rap = function(l) {
 statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {    
   
   if (!is.factor(c1)) {c1 <- as.factor(c1) }
-  if (!is.factor(c2)) {c1 <- as.factor(c2) }
+  if (!is.factor(c2)) {c2 <- as.factor(c2) }
   
   df <- data.frame(c1 = c1, c2 = c2, event = y)
   
@@ -868,7 +868,7 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
 CI.classNRI <- function(c1, c2, y, s1 = NULL, s2 = NULL,  conf.level = 0.95, n.boot = 1000, dp = 3) {
   
   if (!is.factor(c1)) {c1 <- as.factor(c1) }
-  if (!is.factor(c2)) {c1 <- as.factor(c2) }
+  if (!is.factor(c2)) {c2 <- as.factor(c2) }
   
   results <- statistics.classNRI(c1, c2,y,s1,s2)  
   
