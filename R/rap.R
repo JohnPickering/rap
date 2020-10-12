@@ -541,17 +541,12 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
   results.matrix_upper_CI <- results.df %>% 
     summarise(across(where(is.numeric), ~round(quantile(.x,c(1 - (1-conf.level)/2)),dp)))
   
-<<<<<<< HEAD
   temp <- bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)
   results.matrix <- t(temp)
   colnames(results.matrix) <- c("V1", "V2", "V3")
 
   results.matrix <- as_tibble(results.matrix)
 
-=======
-  results.matrix <- as_tibble(t(bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)), .name_repair = "minimal")
-  
->>>>>>> 68f090c668afca3a4833ecfe44fe9aad592b0a14
   results.matrix$metric <- names(results.boot[[1]]) 
   
   results.matrix <- results.matrix %>% 
