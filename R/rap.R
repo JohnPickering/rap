@@ -757,7 +757,7 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
   c_both <- c(c1, c2)
   if (!is.factor(c1)) {c1 <- factor(c1, levels = levels(factor(c_both))) }
   if (!is.factor(c2)) {c2 <- factor(c2, levels = levels(factor(c_both))) }
-  
+
   df <- data.frame(c1 = c1, c2 = c2, event = y)
   
   #Remove rows with missing data
@@ -869,6 +869,7 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
 CI.classNRI <- function(c1, c2, y, s1 = NULL, s2 = NULL,  conf.level = 0.95, n.boot = 1000, dp = 3) {
   
   c_both <- c(c1, c2) 
+
   if (!is.factor(c1)) {c1 <- factor(c1, levels = levels(factor(c_both))) }
   if (!is.factor(c2)) {c2 <- factor(c2, levels = levels(factor(c_both))) }
   
