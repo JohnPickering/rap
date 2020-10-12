@@ -7,7 +7,7 @@
 extract_NRI_CI(results.boot, conf.level, n.boot, dp)
 }
 \arguments{
-\item{results.boot}{The matrix of n.boot metrics from within CI.raplot}
+\item{results.boot}{The matrix of n.boot metrics from within CI.NRI}
 
 \item{conf.level}{The confidence interval expressed between 0 & 1 (eg 95\%CI is conf.level = 0.95)}
 
@@ -19,5 +19,5 @@ extract_NRI_CI(results.boot, conf.level, n.boot, dp)
 A two column matrix with the metric name and statistic with a confidence interval
 }
 \description{
-Extract a confidence in interval from the bootstrapped results. Used by CI.raplot
+Extract a confidence in interval from the bootstrapped results. Used by CI.NRI
 }

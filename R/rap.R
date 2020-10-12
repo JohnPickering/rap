@@ -537,11 +537,15 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
   results.matrix_est <- results.df %>% 
     summarise(across(where(is.numeric), ~round(quantile(.x,c(0.5)),dp)))
   results.matrix_lower_CI <- results.df %>% 
-    summarise(across(where(is.numeric), ~round(quantile(.x,c((1-conf.level)/2)),dp)))
+    summarise(across(where(is.numeric), ~round(quantile(.x,c((1 - conf.level)/2)),dp)))
   results.matrix_upper_CI <- results.df %>% 
     summarise(across(where(is.numeric), ~round(quantile(.x,c(1 - (1-conf.level)/2)),dp)))
   
-  results.matrix <- as_tibble(t(bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)))
+  temp <- bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)
+  results.matrix <- t(temp)
+  colnames(results.matrix) <- c("V1", "V2", "V3")
+
+  results.matrix <- as_tibble(results.matrix)
   
   results.matrix$metric <- names(results.boot[[1]]) 
   
@@ -554,9 +558,9 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
 
 #' Extract NRI confidence intervals
 #' 
-#' Extract a confidence in interval from the bootstrapped results. Used by CI.raplot
+#' Extract a confidence in interval from the bootstrapped results. Used by CI.NRI
 #' 
-#' @param results.boot The matrix of n.boot metrics from within CI.raplot
+#' @param results.boot The matrix of n.boot metrics from within CI.NRI
 #' @param conf.level The confidence interval expressed between 0 & 1 (eg 95\%CI is conf.level = 0.95)
 #' @param n.boot The number of bootstrapped samples
 #' @param dp the number of decimal places to report the point estimate and confidence interval
@@ -582,9 +586,13 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
   results.matrix_upper_CI <- results.df %>% 
     summarise(across(where(is.numeric), ~round(quantile(.x,c(1 - (1-conf.level)/2)),dp)))
   
-  results.matrix <- as_tibble(t(bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)))
+  temp <- bind_rows(results.matrix_est, results.matrix_lower_CI , results.matrix_upper_CI)
+  results.matrix <- t(temp)
+  colnames(results.matrix) <- c("V1", "V2", "V3")
   
-  results.matrix$metric <- names(temp)
+  results.matrix <- as_tibble(results.matrix)
+  results.matrix$metric <- names(results.boot[[1]])[1:10] 
+  
   results.matrix <- results.matrix %>% 
     mutate(statistics = paste0( V1, " (CI: ",V2, " to ", V3,")" )) %>% 
     select(metric, statistics)
@@ -760,11 +768,8 @@ statistics.classNRI <- function(c1, c2, y,s1 = NULL, s2 = NULL) {
   
   u <- sort(unique(df$event))
   if (length(u) != 2 || u[1] != 0 || u[2] != 1)
-<<<<<<< HEAD
     stop("Outcome/Event must have two values: 0 and 1")
-=======
-    stop("Ootcome/Event must have two values: 0 and 1")
->>>>>>> a7b645b492733abb5b835a534d7c4129d87c62bd
+
   
   n <- nrow(df)
   n_event = sum(df$event)
