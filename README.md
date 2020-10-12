@@ -1,5 +1,5 @@
 John W Pickering
-9 October 2020
+12 October 2020
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -154,16 +154,16 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 #> # A tibble: 22 x 2
 #>    metric            statistics                
 #>    <chr>             <chr>                     
-#>  1 n                 432 (CI: 428.95 to 436)   
-#>  2 n_event           84.5 (CI: 72.85 to 103)   
-#>  3 n_non_event       350 (CI: 327.48 to 356.57)
-#>  4 Prevalence        0.19 (CI: 0.17 to 0.24)   
-#>  5 NRI_up_event      22.5 (CI: 12.95 to 31.62) 
-#>  6 NRI_up_nonevent   20 (CI: 12.48 to 30)      
-#>  7 NRI_down_event    12 (CI: 5.48 to 20.57)    
-#>  8 NRI_down_nonevent 81 (CI: 52.7 to 106.3)    
-#>  9 NRI_event         0.12 (CI: 0 to 0.22)      
-#> 10 NRI_nonevent      0.18 (CI: 0.1 to 0.23)    
+#>  1 n                 433 (CI: 429.48 to 437.05)
+#>  2 n_event           84.5 (CI: 77.95 to 98.72) 
+#>  3 n_non_event       350 (CI: 334.9 to 355.52) 
+#>  4 Prevalence        0.19 (CI: 0.18 to 0.23)   
+#>  5 NRI_up_event      18.5 (CI: 13.48 to 32.25) 
+#>  6 NRI_up_nonevent   20 (CI: 10.85 to 27.52)   
+#>  7 NRI_down_event    11.5 (CI: 4.95 to 15)     
+#>  8 NRI_down_nonevent 79.5 (CI: 53.85 to 93.05) 
+#>  9 NRI_event         0.09 (CI: 0.01 to 0.25)   
+#> 10 NRI_nonevent      0.16 (CI: 0.11 to 0.22)   
 #> # … with 12 more rows
 ```
 
