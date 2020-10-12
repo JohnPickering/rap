@@ -72,94 +72,6 @@ outcome <- data_risk$outcome
 
 assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
                         n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Setting levels: control = 0, case = 1
-#> Setting direction: controls < cases
-#> Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
-#> Using compatibility `.name_repair`.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_warnings()` to see where this warning was generated.
 
 # View results  
 ## meta data  
@@ -242,16 +154,16 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 #> # A tibble: 22 x 2
 #>    metric            statistics                
 #>    <chr>             <chr>                     
-#>  1 n                 434 (CI: 427.43 to 437.57)
-#>  2 n_event           85 (CI: 66.28 to 96.67)   
-#>  3 n_non_event       349 (CI: 334.43 to 368.67)
-#>  4 Prevalence        0.2 (CI: 0.15 to 0.22)    
-#>  5 NRI_up_event      19.5 (CI: 9.38 to 30.72)  
-#>  6 NRI_up_nonevent   20.5 (CI: 15.95 to 27.05) 
-#>  7 NRI_down_event    10.5 (CI: 5 to 18)        
-#>  8 NRI_down_nonevent 83 (CI: 49.75 to 120.62)  
-#>  9 NRI_event         0.09 (CI: 0.02 to 0.23)   
-#> 10 NRI_nonevent      0.17 (CI: 0.08 to 0.26)   
+#>  1 n                 432.5 (CI: 426.9 to 437.1)
+#>  2 n_event           82.5 (CI: 71.43 to 98.72) 
+#>  3 n_non_event       349 (CI: 333.27 to 362.57)
+#>  4 Prevalence        0.19 (CI: 0.16 to 0.23)   
+#>  5 NRI_up_event      20 (CI: 10.43 to 31.3)    
+#>  6 NRI_up_nonevent   20 (CI: 12.48 to 28)      
+#>  7 NRI_down_event    10 (CI: 5 to 18)          
+#>  8 NRI_down_nonevent 76.5 (CI: 60.95 to 105.87)
+#>  9 NRI_event         0.09 (CI: -0.03 to 0.19)  
+#> 10 NRI_nonevent      0.16 (CI: 0.11 to 0.23)   
 #> # … with 12 more rows
 ```
 
@@ -278,7 +190,6 @@ ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ``` r
 ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
-#> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 ```
 
 <img src="man/figures/README-ggdecision-1.png" width="100%" />
@@ -293,17 +204,17 @@ reclassification:
 
 baseline_class <- data_class$base_class
 new_class <- data_class$new_class
-outcome_class <- data_class$Outcome
+outcome_class <- data_class$outcome
 
 class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome_class, n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  
-#(class_assessment$meta_data)
+(class_assessment$meta_data)
 
 ## exact point estimates and confusion matrices
-#(class_assessment$Metrics)
+(class_assessment$Metrics)
 
 ## bootstrap derived metrics with confidence intervals  
-#(class_assessment$Summary_metrics)
+(class_assessment$Summary_metrics)
 ```

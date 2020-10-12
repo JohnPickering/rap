@@ -546,7 +546,7 @@ extractCI <- function(results.boot, conf.level, n.boot, dp){
   colnames(results.matrix) <- c("V1", "V2", "V3")
 
   results.matrix <- as_tibble(results.matrix)
-  
+
   results.matrix$metric <- names(results.boot[[1]]) 
   
   results.matrix <- results.matrix %>% 
@@ -591,8 +591,8 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
   colnames(results.matrix) <- c("V1", "V2", "V3")
   
   results.matrix <- as_tibble(results.matrix)
-  results.matrix$metric <- names(results.boot[[1]])[1:10] 
-  
+  results.matrix$metric <- names(results.boot[[1]])[1:10]
+
   results.matrix <- results.matrix %>% 
     mutate(statistics = paste0( V1, " (CI: ",V2, " to ", V3,")" )) %>% 
     select(metric, statistics)
