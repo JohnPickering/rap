@@ -1,12 +1,11 @@
 John W Pickering
-12 October 2020
+7 March 2023
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # rap
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The rap package contains functions for generating statistical metrics
@@ -27,38 +26,41 @@ devtools::install_github("JohnPickering/rap")
 ## History and versions
 
 rap began as Matlab code in 2012 after I wrote a paper
-([1](https://cjasn.asnjournals.org/content/7/8/1355)) for the Nephrology
-community on assessing the added value of one biomarker to a clinical
-prediction model. I worked with Professor Zoltan Endre on that paper. Dr
-David Cairns kindly provided some R code for the Risk Assessment Plot.
-This formed the basis of versions 0.1 to 0.4. Importantly, for those
-versions and the current version all errors are mine (sorry) and not
-those of Professor Endre or Dr Cairns. Since writing that paper I’ve
-come to consider some metrics as not helpful. So, for the current
-version I have dropped some statistical metrics that I believe are poor
-or wrongly applied. In particularly, I dropped providing the total NRI
-(Net Reclassification Improvement) and total IDI (Integrated
-Discrimination Improvement) metrics. These should never be presented
-because they inappropriately add together two fractions with differing
-denominators (NRI) or two means (IDI). Instead, these the NRIs and IDIs
-for those with and without the event of interest should be provided.
-Third, I have provided the change in AUCs rather than a p-value because
-the change is much more meaningful.
+(<a href="https://cjasn.asnjournals.org/content/7/8/1355"
+target="_blank">1</a>) for the Nephrology community on assessing the
+added value of one biomarker to a clinical prediction model. I worked
+with Professor Zoltan Endre on that paper. Dr David Cairns kindly
+provided some R code for the Risk Assessment Plot. This formed the basis
+of versions 0.1 to 0.4. Importantly, for those versions and the current
+version all errors are mine (sorry) and not those of Professor Endre or
+Dr Cairns. Since writing that paper I’ve come to consider some metrics
+as not helpful. So, for the current version I have dropped some
+statistical metrics that I believe are poor or wrongly applied. In
+particularly, I dropped providing the total NRI (Net Reclassification
+Improvement) and total IDI (Integrated Discrimination Improvement)
+metrics. These should never be presented because they inappropriately
+add together two fractions with differing denominators (NRI) or two
+means (IDI). Instead, these the NRIs and IDIs for those with and without
+the event of interest should be provided. Third, I have provided the
+change in AUCs rather than a p-value because the change is much more
+meaningful.
 
-Version 1.03 is the current version and represents a major change and
-update.
+Version 1.03 were major changes:  
+\* allowed as input logistic regression models from glm (stats) and lrm
+(rms) as well as risk predictions calculated elsewhere. \* provided as
+outputs in addition to the Risk Assessment Plot, a form of calibration
+plot and decision curve.  
+\* the output from the main functions CI.raplot, and CI.classNRI are now
+lists that include the metrics for each bootstrap sample as well as the
+summary metrics. CI.classNRI also produces confusion matrices for those
+with and without the event of interest (separately). Bootstrapping is
+used to determine confidence intervals.
 
-This version allows as input logistic regression models from glm (stats)
-and lrm (rms) as well as risk predictions calculated elsewhere.
-
-This version provides as outputs in addtion to the Risk Assessment Plot,
-a form of calibration plot and decision curve.
-
-Finally, the output from the main functions CI.raplot, and CI.classNRI
-are now lists that include the metrics for each bootstrap sample as well
-as the summary metrics. CI.classNRI also produces confusion matrices for
-those with and without the event of interest (separately). Bootstrapping
-is used to determine confidence intervals.
+Version 1.10 (current):  
+\* addition of ROC plot. \* calibration plot now uses (best practice)
+continuous curves (the old format is now “ggcalibrate_original()”).  
+\* addition of precision recall curves. \* all plots can be for one or
+two models.
 
 ## Example 1
 
@@ -74,7 +76,7 @@ new_risk <- data_risk$new              # or the new glm model itself
 outcome <- data_risk$outcome
 
 assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
-                        n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
+                        n.boot = 20, dp = 2) # Note the default is 1000 bootstraps (n.boot = 1000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  
@@ -154,19 +156,19 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 
 ## bootstrap derived metrics with confidence intervals  
 (assessment$Summary_metrics)
-#> # A tibble: 22 x 2
+#> # A tibble: 22 × 2
 #>    metric            statistics                  
 #>    <chr>             <chr>                       
-#>  1 n                 434 (CI: 428 to 439.1)      
-#>  2 n_event           81.5 (CI: 73.43 to 96.53)   
-#>  3 n_non_event       349.5 (CI: 335.95 to 361.57)
-#>  4 Prevalence        0.19 (CI: 0.17 to 0.22)     
-#>  5 NRI_up_event      19 (CI: 14 to 26.1)         
-#>  6 NRI_up_nonevent   21.5 (CI: 14.38 to 28)      
-#>  7 NRI_down_event    11 (CI: 4.95 to 16.52)      
-#>  8 NRI_down_nonevent 83 (CI: 61.38 to 103.3)     
-#>  9 NRI_event         0.1 (CI: 0.01 to 0.18)      
-#> 10 NRI_nonevent      0.17 (CI: 0.11 to 0.23)     
+#>  1 n                 432 (CI: 427.9 to 440.52)   
+#>  2 n_event           88.5 (CI: 71.22 to 97.57)   
+#>  3 n_non_event       345.5 (CI: 333.42 to 361.15)
+#>  4 Prevalence        0.2 (CI: 0.16 to 0.23)      
+#>  5 NRI_up_event      19 (CI: 10.8 to 30.72)      
+#>  6 NRI_up_nonevent   19.5 (CI: 11.95 to 27.57)   
+#>  7 NRI_down_event    11 (CI: 6.48 to 18.1)       
+#>  8 NRI_down_nonevent 69.5 (CI: 51.9 to 101.07)   
+#>  9 NRI_event         0.09 (CI: 0 to 0.23)        
+#> 10 NRI_nonevent      0.15 (CI: 0.08 to 0.22)     
 #> # … with 12 more rows
 ```
 
@@ -180,11 +182,15 @@ ggrap(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 <img src="man/figures/README-ggrap-1.png" width="100%" />
 
+``` r
+
+# for Single risks x2 = NULL
+```
+
 ### The calibration curve
 
 ``` r
 ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
-#> $g
 ```
 
 <img src="man/figures/README-ggcalibrate-1.png" width="100%" />
@@ -196,6 +202,26 @@ ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
 ```
 
 <img src="man/figures/README-ggdecision-1.png" width="100%" />
+
+### The precission-recall curve
+
+``` r
+ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
+```
+
+<img src="man/figures/README-ggrerec-1.png" width="100%" />
+
+### The roc plot
+
+``` r
+ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome)
+```
+
+<img src="man/figures/README-ggroc-1.png" width="100%" />
+
+Note, there are additional options for the ROC plot including labelling
+points and distinguishing areas of the plot that are diagnostic from
+those that are not.
 
 ## Example 2
 
@@ -278,17 +304,17 @@ class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome
 
 ## bootstrap derived metrics with confidence intervals  
 (class_assessment$Summary_metrics)
-#> # A tibble: 10 x 2
-#>    metric            statistics                  
-#>    <chr>             <chr>                       
-#>  1 n                 444 (CI: 444 to 444)        
-#>  2 n_event           60.5 (CI: 51.38 to 75.62)   
-#>  3 n_non_event       383.5 (CI: 368.38 to 392.62)
-#>  4 Prevalence        0.14 (CI: 0.12 to 0.17)     
-#>  5 NRI_up_event      21 (CI: 16.48 to 31.2)      
-#>  6 NRI_up_nonevent   93 (CI: 80.95 to 107.62)    
-#>  7 NRI_down_event    5 (CI: 1.95 to 9.1)         
-#>  8 NRI_down_nonevent 71.5 (CI: 60.95 to 84.57)   
-#>  9 NRI_event         0.26 (CI: 0.15 to 0.39)     
-#> 10 NRI_nonevent      -0.06 (CI: -0.12 to 0.01)
+#> # A tibble: 10 × 2
+#>    metric            statistics                 
+#>    <chr>             <chr>                      
+#>  1 n                 444 (CI: 444 to 444)       
+#>  2 n_event           62.5 (CI: 51.38 to 75.1)   
+#>  3 n_non_event       381.5 (CI: 368.9 to 392.62)
+#>  4 Prevalence        0.14 (CI: 0.12 to 0.17)    
+#>  5 NRI_up_event      22 (CI: 14.48 to 31.57)    
+#>  6 NRI_up_nonevent   94.5 (CI: 78.8 to 103.1)   
+#>  7 NRI_down_event    5 (CI: 1.48 to 8)          
+#>  8 NRI_down_nonevent 73 (CI: 59.42 to 83.62)    
+#>  9 NRI_event         0.27 (CI: 0.16 to 0.42)    
+#> 10 NRI_nonevent      -0.05 (CI: -0.1 to -0.01)
 ```

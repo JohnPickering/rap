@@ -4,22 +4,18 @@
 \alias{ggcalibrate}
 \title{The Calibration plot}
 \usage{
-ggcalibrate(
-  x1,
-  x2,
-  y,
-  models = c("both", "x1", "x2"),
-  n_cut = 5,
-  cut_type = c("interval", "number", "width"),
-  include_margin = FALSE
-)
+ggcalibrate(x1, x2 = NULL, y = NULL, n_knots = 5, ci_level = 0.95)
 }
 \arguments{
-\item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or alculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
+\item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
 
 \item{x2}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1}
 
 \item{y}{Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE).}
+
+\item{n_knots}{The curves are made by fitting a restricted cubic spline (rms package). The default 5-knots is usually enough.}
+
+\item{ci_level}{Confidence interval of the curve (default = 0.95).}
 
 \item{models}{One of three strings:
 \itemize{
@@ -27,20 +23,9 @@ ggcalibrate(
 \item{\strong{x1}} {plot(s) will contain only the Baseline model;} 
 \item{\strong{x2}} {plot(s) will contain only the New model.}
 }}
-
-\item{n_cut}{An integer indicating either the number of intervals of the same width, the number of intervals of the same number of subjects, or the width (as a percentage) of the intervals.}
-
-\item{cut_type}{One of three strings:
-\itemize{
-\item{\strong{interval}} {applies the cut_interval() function to get n_cut intervals of approximately equal width;}
-\item{\strong{number}} {applies the cut_number() function to get n_cut intervals of approximately equal number of subjects;} 
-\item{\strong{width}} {applies the cut_width() function to get ~ 100/n_cut intervals of n_cut width.}
-}}
-
-\item{include_margin}{TRUE for including producing a bar plot of the counts of in each of the intervals. Default is FALSE.  Note if the output is saved to my_graphs then using the library gridExtra the function grid.arrange(graphs$g, graphs$g_marg , nrow = 2, heights = c(2,1)) will produce a plot with both the calibration plot and the marginal plot.}
 }
 \value{
-a list of one or two ggplots
+a ggplot
 }
 \description{
 ggcalibrate plots the stats::predicted events against the actual event rate
@@ -52,6 +37,6 @@ y<-data_risk$outcome
 x1<-data_risk$baseline
 x2<-data_risk$new
 #e.g.
-output <- ggcalibrate(x1, x2, y, models = "both", n_cut = 10, cut_type = "number") 
+output <- ggcalibrate(x1, x2, y, models = "both") 
 }
 }

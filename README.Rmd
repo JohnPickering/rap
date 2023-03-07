@@ -1,7 +1,7 @@
 ---
 output: github_document
 author: John W Pickering
-date: 12 October 2020
+date: 7 March 2023
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -35,13 +35,16 @@ devtools::install_github("JohnPickering/rap")
 
 rap began as Matlab code in 2012 after I wrote a paper ([1](https://cjasn.asnjournals.org/content/7/8/1355){target="_blank"}) for the Nephrology community on assessing the added value of one biomarker to a clinical prediction model. I worked with Professor Zoltan Endre on that paper.  Dr David Cairns kindly provided some R code for the Risk Assessment Plot.  This formed the basis of versions 0.1 to 0.4. Importantly, for those versions and the current version all errors are mine (sorry) and not those of Professor Endre or Dr Cairns. Since writing that paper I've come to consider some metrics as not helpful.  So, for the current version I have dropped some statistical metrics that I believe are poor or wrongly applied.  In particularly, I dropped providing the total NRI (Net Reclassification Improvement) and total IDI (Integrated Discrimination Improvement) metrics.  These should never be presented because they inappropriately add together two fractions with differing denominators (NRI) or two means (IDI).  Instead, these the NRIs and IDIs for those with and without the event of interest should be provided. Third, I have provided the change in AUCs rather than a p-value because the change is much more meaningful. 
 
-Version 1.03 is the current version and represents a major change and update.  
-
-This version allows as input logistic regression models from glm (stats) and lrm (rms) as well as risk predictions calculated elsewhere.
-
-This version provides as outputs in addtion to the Risk Assessment Plot, a form of calibration plot and decision curve.  
-
-Finally, the output from the main functions CI.raplot, and CI.classNRI are now lists that include the metrics for each bootstrap sample as well as the summary metrics. CI.classNRI also produces confusion matrices for those with and without the event of interest (separately). Bootstrapping is used to determine confidence intervals.  
+Version 1.03 were major changes:  
+* allowed as input logistic regression models from glm (stats) and lrm (rms) as well as risk predictions calculated elsewhere.
+* provided as outputs in addition to the Risk Assessment Plot, a form of calibration plot and decision curve.  
+* the output from the main functions CI.raplot, and CI.classNRI are now lists that include the metrics for each bootstrap sample as well as the summary metrics. CI.classNRI also produces confusion matrices for those with and without the event of interest (separately). Bootstrapping is used to determine confidence intervals.  
+ 
+Version 1.10 (current):  
+* addition of ROC plot. 
+* calibration plot now uses (best practice) continuous curves (the old format is now "ggcalibrate_original()").  
+* addition of precision recall curves.
+* all plots can be for one or two models.  
 
 ## Example 1
 
@@ -56,7 +59,7 @@ new_risk <- data_risk$new              # or the new glm model itself
 outcome <- data_risk$outcome
 
 assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
-                        n.boot = 20, dp = 2) # Note the default is 2000 bootstraps (n.boot = 2000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
+                        n.boot = 20, dp = 2) # Note the default is 1000 bootstraps (n.boot = 1000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
 
 # View results  
 ## meta data  
@@ -76,6 +79,7 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 ```{r ggrap, warning = FALSE,  message = FALSE}
 ggrap(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
+# for Single risks x2 = NULL
 ```
 
 ### The calibration curve
@@ -90,6 +94,19 @@ ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
+### The precission-recall curve
+```{r ggrerec, warning = FALSE,message = FALSE}
+ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
+
+```
+
+### The roc plot
+```{r ggroc, warning = FALSE,message = FALSE}
+ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome)
+
+```
+
+Note, there are additional options for the ROC plot including labelling points and distinguishing areas of the plot that are diagnostic from those that are not.  
 
 ## Example 2
 

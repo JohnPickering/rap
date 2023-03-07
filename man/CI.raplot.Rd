@@ -4,7 +4,7 @@
 \alias{CI.raplot}
 \title{Statistical metrics with confidence intervals}
 \usage{
-CI.raplot(x1, x2, y = NULL, t = NULL, conf.level = 0.95, n.boot = 2000, dp = 3)
+CI.raplot(x1, x2, y = NULL, t = NULL, conf.level = 0.95, n.boot = 1000, dp = 3)
 }
 \arguments{
 \item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}

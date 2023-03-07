@@ -4,10 +4,10 @@
 \alias{ggdecision}
 \title{The Decision curve}
 \usage{
-ggdecision(x1, x2, y)
+ggdecision(x1, x2 = NULL, y = NULL)
 }
 \arguments{
-\item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or alculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
+\item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
 
 \item{x2}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1}
 
@@ -17,7 +17,7 @@ ggdecision(x1, x2, y)
 a ggplot
 }
 \description{
-ggdecision plots decsion curves to assess the net benefit at different thresholds
+ggdecision plots decision curves to assess the net benefit at different thresholds
 }
 \references{
 Vickers AJ, van Calster B, Steyerberg EW. A simple, step-by-step guide to interpreting decision curve analysis. Diagn Progn Res 2019;3(1):18. 2. Zhang Z, Rousson V, Lee W-C, et al. Decision curve analysis: a technical note. Ann Transl Med 2018;6(15):308–308.
