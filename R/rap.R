@@ -41,31 +41,34 @@ ggrap <- function(x1, x2=NULL, y=NULL) {
   }
   if (!is.null(x2) & length(x1) != length(x2))
     stop("Reference (baseline) and New (Alt) model vectors must be the same length")
+  if (is.null(y))
+    stop("Oops - there must be event data (y)")
+  
   
   
   if(!is.null(x2)){
-  df <- data.frame(Baseline = x1, New = x2, Event = y)
-  df <- df |> 
-    filter(!is.na(Baseline)) |> 
-    filter(!is.na(New)) |> 
-    filter(!is.na(Event))
-  df$ID = seq(1,nrow(df),1)
-  
-  df_long <- df |> 
-    tidyr::pivot_longer(cols = c(Baseline,New), values_to = "Probabilities", names_to = "Model") |> 
-    group_by(Model)  |> 
-    arrange(Model, Probabilities) |> 
-    group_by(Model,Probabilities) |> 
-    reframe(n_event = sum(Event == 1),
+    df <- data.frame(Baseline = x1, New = x2, Event = y)
+    df <- df |> 
+      filter(!is.na(Baseline)) |> 
+      filter(!is.na(New)) |> 
+      filter(!is.na(Event))
+    df$ID = seq(1,nrow(df),1)
+    
+    df_long <- df |> 
+      tidyr::pivot_longer(cols = c(Baseline,New), values_to = "Probabilities", names_to = "Model") |> 
+      group_by(Model)  |> 
+      arrange(Model, Probabilities) |> 
+      group_by(Model,Probabilities) |> 
+      reframe(n_event = sum(Event == 1),
               n_nonevent = sum(Event == 0),
               IDs = as.character(ID)) |> 
-    ungroup() |> 
-    group_by(Model) |> 
-    mutate(n_event_cumulative = cumsum(n_event)) |> 
-    mutate(n_nonevent_cumulative = cumsum(n_nonevent)) |> 
-    mutate(Sensitivity = (max(n_event_cumulative) - n_event_cumulative)/max(n_event_cumulative)) |> 
-    mutate(`1-Specificity` = (max(n_nonevent_cumulative) - n_nonevent_cumulative)/max(n_nonevent_cumulative)) |> 
-    ungroup()
+      ungroup() |> 
+      group_by(Model) |> 
+      mutate(n_event_cumulative = cumsum(n_event)) |> 
+      mutate(n_nonevent_cumulative = cumsum(n_nonevent)) |> 
+      mutate(Sensitivity = (max(n_event_cumulative) - n_event_cumulative)/max(n_event_cumulative)) |> 
+      mutate(`1-Specificity` = (max(n_nonevent_cumulative) - n_nonevent_cumulative)/max(n_nonevent_cumulative)) |> 
+      ungroup()
   }
   
   if(is.null(x2)){
@@ -74,15 +77,15 @@ ggrap <- function(x1, x2=NULL, y=NULL) {
       filter(!is.na(Baseline)) |> 
       filter(!is.na(Event))
     df$ID = seq(1,nrow(df),1)
-  
+    
     df_long <- df |> 
       tidyr::pivot_longer(cols = c(Baseline), values_to = "Probabilities", names_to = "Model") |> 
       group_by(Model)  |> 
       arrange(Model, Probabilities) |> 
       group_by(Model,Probabilities) |> 
       reframe(n_event = sum(Event == 1),
-                n_nonevent = sum(Event == 0),
-                IDs = as.character(ID)) |> 
+              n_nonevent = sum(Event == 0),
+              IDs = as.character(ID)) |> 
       ungroup() |> 
       group_by(Model) |> 
       mutate(n_event_cumulative = cumsum(n_event)) |> 
@@ -90,7 +93,7 @@ ggrap <- function(x1, x2=NULL, y=NULL) {
       mutate(Sensitivity = (max(n_event_cumulative) - n_event_cumulative)/max(n_event_cumulative)) |> 
       mutate(`1-Specificity` = (max(n_nonevent_cumulative) - n_nonevent_cumulative)/max(n_nonevent_cumulative)) |> 
       ungroup()
-    }
+  }
   
   
   
@@ -107,14 +110,14 @@ ggrap <- function(x1, x2=NULL, y=NULL) {
     select(Probabilities, Sensitivity, `1-Specificity`, Model, ID_list) |>
     tidyr::pivot_longer(cols = c(Sensitivity, `1-Specificity`), values_to = "Metric", names_to = "Metric name")
   
-
+  
   if(!is.null(x2)){
     g <- ggplot(df_g, aes(x = Probabilities, y = Metric, colour = `Metric name`, linetype = Model )) + 
       scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
       scale_y_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) +
       geom_line() +
       scale_linetype_manual(values = c("dotted", "solid")) 
-    }
+  }
   if(is.null(x2)){
     g <- ggplot(df_g, aes(x = Probabilities, y = Metric, colour = `Metric name` )) + 
       scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
@@ -172,6 +175,10 @@ ggdecision <- function(x1, x2=NULL, y=NULL) {
   }
   if (!is.null(x2) & length(x1) != length(x2))
     stop("Reference (baseline) and New (Alt) model vectors must be the same length")
+  if (is.null(y))
+    stop("Oops - there must be event data (y)")
+  
+  
   
   # Two lines
   if(!is.null(x2)){
@@ -522,6 +529,7 @@ ggprerec <- function(x1, x2=NULL, y=NULL) {
     stop("Oops - there must be event data (y)")
   
   
+  
   if(!is.null(x2)) {
     df <- data.frame(Baseline = x1, New = x2, Event = y)
     df <- df |> 
@@ -545,7 +553,7 @@ ggprerec <- function(x1, x2=NULL, y=NULL) {
   incidence <- 100 * n_event/n
   prevalence <- n_event/n
   incidence <- 100 * prevalence
-
+  
   
   # pr curves
   pr.1 <- df |> 
@@ -667,6 +675,7 @@ ggcalibrate <- function(x1, x2 = NULL, y = NULL,  n_knots = 5, ci_level=0.95) {
     }
     x2 = stats::predict(x2, type = "fitted")
   }
+  
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
     data_type = "User supplied"
   }
@@ -676,14 +685,11 @@ ggcalibrate <- function(x1, x2 = NULL, y = NULL,  n_knots = 5, ci_level=0.95) {
     stop("Oops - there must be event data (y)")
   
   
+  
+  
   # Two lines 
   if(!is.null(x2)){
     df <- data.frame(Baseline = x1, New = x2, Event = y)
-    
-    df <- df  |>  
-      filter(!is.na(Baseline)) |> 
-      filter(!is.na(New)) |> 
-      filter(!is.na(Event))
     
     df$ID = seq(1,nrow(df),1)
     
@@ -774,7 +780,7 @@ ggcalibrate <- function(x1, x2 = NULL, y = NULL,  n_knots = 5, ci_level=0.95) {
 #'x1<-data_risk$baseline
 #'x2<-data_risk$new
 #'#e.g.
-#'output <- ggcalibrate(x1, x2, y, models = "both", n_cut = 10, cut_type = "number") 
+#'output <- ggcalibrate(x1, x2 = NULL , y = NULL,  n_cut = 5, cut_type = "interval", include_margin = FALSE) 
 #'}
 #' @import forcats
 #' @import ggplot2
@@ -806,6 +812,7 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
     }
     x2 = stats::predict(x2, type = "fitted")
   }
+  
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
     data_type = "User supplied"
   }
@@ -814,11 +821,14 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
   if (is.null(y))
     stop("Oops - there must be event data (y)")
   
+  
+  if (!is.null(x2)){
   df <- data.frame(Baseline = x1, New = x2, Event = y)
-  df <- df %>% 
-    filter(!is.na(Baseline)) %>% 
-    filter(!is.na(New)) %>% 
-    filter(!is.na(Event))
+  }
+  if (is.null(x2)){
+    df <- data.frame(Baseline = x1, Event = y)
+  }
+  
   df$ID = seq(1,nrow(df),1)
   
   n <- nrow(df)
@@ -828,15 +838,22 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
   
   
   # Calibration
-  
-  df_long <- df %>% 
+  if (!is.null(x2)){
+      df_long <- df %>% 
     tidyr::pivot_longer(cols = c(Baseline,New), values_to = "prediction", names_to = "Model") %>% 
     select(Model,Event, prediction) %>% # or whatever your outcome and predictions are
     mutate(prediction = 100 * as.numeric(prediction)) %>%  # If prediciton is in the 0-1 range I prefer it in the 0-100 range
     filter(!is.na(prediction)) 
+  }
+
+  if (is.null(x2)){
+    df_long <- df %>% 
+      tidyr::pivot_longer(cols = c(Baseline), values_to = "prediction", names_to = "Model") %>% 
+      select(Model,Event, prediction) %>% # or whatever your outcome and predictions are
+      mutate(prediction = 100 * as.numeric(prediction)) %>%  # If prediciton is in the 0-1 range I prefer it in the 0-100 range
+      filter(!is.na(prediction)) 
+  }
   
-  if(models == "x1"){df_long <- df_long %>% filter(Model == "Baseline")}  
-  if(models == "x2"){df_long <- df_long %>% filter(Model == "New")}  
   
   if(cut_type == "interval"){df_long <- df_long %>% group_by(Model) %>% mutate(pred_interval = cut_interval(prediction, n = n_cut))}
   if(cut_type == "number"){df_long <- df_long %>% group_by(Model) %>% mutate(pred_interval = cut_number(prediction, n = n_cut))}
@@ -889,17 +906,17 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
            gdf$pred_interval <- fct_inorder(gdf$pred_interval)
            
            
-           if(models == "both"){ 
+           if(!is.null(x2)){ 
              g_marg <- ggplot(gdf) +
                geom_col(aes(x = mn_pred, y = n, fill = Model), width = width * 2/3, alpha = 0.6)  
            }
            
-           if(models == "x1" | models == "x2"){
+           if(is.null(x2)){
              g_marg <- ggplot(gdf) +
                geom_col(aes(x = mn_pred, y = n), width = width * 2/3, alpha = 0.6)  
            }
            
-           g_marg <-   g_marg +   
+           g_marg <- g_marg +   
              scale_x_continuous(breaks = seq(0,100,10)) +
              xlab("Predicted percentage") +
              ylab("Count") +
@@ -918,6 +935,8 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
 
 
 
+
+
 #' Statistical metrics
 #' 
 #' The function statistics.raplot calculates the reclassification metrics. Used by CI.raplot.
@@ -932,17 +951,17 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
 #' @import tidyr
 #' @export
 #' 
-statistics.raplot <- function(x1, x2, y,  t = NULL) {   
+statistics.raplot <- function(x1, x2, y,  t = NULL, NRI_return = FALSE) {   
   if (is.null(y))
     stop("Oops - there must be event data (y)")
   
   df <- data.frame(x1 = x1, x2 = x2, y = y) # y = 1 for the event, 0 for not the event.  
   
-  #Remove rows with missing data
-  df <- df |>  
-    filter(!is.na(x1)) |> 
-    filter(!is.na(x2)) |> 
-    filter(!is.na(y))
+  #Remove rows with missing data: Unecessary - need to make sure no missing data in original input.
+  #df <- df |>  
+  #  filter(!is.na(x1)) |> 
+  #  filter(!is.na(x2)) |> 
+  #  filter(!is.na(y))
   
   n <- nrow(df)
   
@@ -955,7 +974,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   
   r <- range(df$x1, df$x2)
   if (r[1] < 0 || r[2] > 1)
-    stop("x1 and x2 must be in [0,1]")
+    stop("x1 must be in [0,1]")
   
   n_event = sum(df$y)
   incidence <- 100*n_event/n
@@ -964,17 +983,25 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   
   # ROC
   roc.1 <- roc(df$y, df$x1)
-  roc.2 <- roc(df$y, df$x2)
   auc.x1 <- as.numeric(auc(roc.1))
+  df_model.1 = data.frame(sens = roc.1$sensitivities, spec = roc.1$specificities, Prediction = roc.1$thresholds)
+  df_model.1 <- df_model.1 |> mutate(Model = "Baseline")
+  
+  
+  roc.2 <- roc(df$y, df$x2)
   auc.x2 <- as.numeric(auc(roc.2))
   auc.difference = auc.x2 - auc.x1
+  df_model.2 = data.frame(sens = roc.2$sensitivities, spec = roc.2$specificities, Prediction = roc.2$thresholds)
+  df_model.2 <- df_model.2 |> mutate(Model = "New")
+  
   
   df <- df |> 
     mutate(risk.class.x1 = Hmisc::cut2(x1,t)) |> #risk groups based on thresholds
+    mutate(mse_x1 = (y - x1)^2) |>  # mean squared errors of the baseline model
     mutate(risk.class.x2 = Hmisc::cut2(x2,t)) |> 
     mutate(difference = x2 - x1)  |>   # difference in probabilities
-    mutate(mse_x1 = (y - x1)^2) |> # mean squared errors of the baseline model
     mutate(mse_x2 = (y - x2)^2)  
+  
   
   n_event = sum(df$y)
   n_non_event = nrow(df) - n_event
@@ -982,6 +1009,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
   prevalence = n_event/n
   
   #NRI
+  
   df_NRI <- df |> 
     group_by(y) |> 
     mutate(up = ifelse(as.numeric(risk.class.x2) > as.numeric(risk.class.x1),1,0))  |> 
@@ -1009,14 +1037,8 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
       brier_new = mean(mse_x2),
       brier_skill = 100 * (brier_baseline - brier_new)/brier_baseline
     )
-  
-  df_model.1 = data.frame(sens = roc.1$sensitivities, spec = roc.1$specificities, Prediction = roc.1$thresholds)
-  df_model.1 <- df_model.1 |> mutate(Model = "Baseline")
-  
-  df_model.2 = data.frame(sens = roc.2$sensitivities, spec = roc.2$specificities, Prediction = roc.2$thresholds)
-  df_model.2 <- df_model.2 |> mutate(Model = "New")
-  
-  df_model = bind_rows(df_model.1, df_model.2)
+  df_model = bind_rows(df_model.1, df_model.2) 
+
   df_model <- df_model |> 
     mutate(Prediction = ifelse(sens == 1 & spec == 0, 0, ifelse(sens == 0 & spec == 1, 1, Prediction) ))
   
@@ -1028,29 +1050,51 @@ statistics.raplot <- function(x1, x2, y,  t = NULL) {
       IP = pracma::trapz(x = c(Prediction), y = 1 - spec) )
   
   # Output
-  output <- list(n = n, 
-                 n_event = n_event, 
-                 n_non_event = n_non_event, 
-                 Prevalence = prevalence,
-                 NRI_up_event = as.integer(df_NRI[df_NRI$y == 1,]$n_up),
-                 NRI_up_nonevent = as.integer(df_NRI[df_NRI$y == 0,]$n_up),
-                 NRI_down_event = as.integer(df_NRI[df_NRI$y == 1,]$n_down),
-                 NRI_down_nonevent = as.integer(df_NRI[df_NRI$y == 0,]$n_down),
-                 NRI_event = df_NRI[df_NRI$y == 1,]$nri,
-                 NRI_nonevent = df_NRI[df_NRI$y == 0,]$nri,
-                 IDI_event = df_IDI[df_IDI$y == 1,]$IDI,
-                 IDI_nonevent = df_IDI[df_IDI$y == 0,]$IDI,
-                 IP_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IP,
-                 IS_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IS,
-                 IP_new = df_model_Istats[df_model_Istats$Model == "New",]$IP, 
-                 IS_new = df_model_Istats[df_model_Istats$Model == "New",]$IS,
-                 Brier_baseline = df_Brier$brier_baseline,
-                 Brier_new = df_Brier$brier_new,
-                 Brier_skill = df_Brier$brier_skill,
-                 AUC_baseline = auc.x1,
-                 AUC_new = auc.x2,
-                 AUC_difference = auc.difference
-  )
+  if(NRI_return == TRUE  ){
+    output <- list(n = n, 
+                   n_event = n_event, 
+                   n_non_event = n_non_event, 
+                   Prevalence = prevalence,
+                   NRI_up_event = as.integer(df_NRI[df_NRI$y == 1,]$n_up),
+                   NRI_up_nonevent = as.integer(df_NRI[df_NRI$y == 0,]$n_up),
+                   NRI_down_event = as.integer(df_NRI[df_NRI$y == 1,]$n_down),
+                   NRI_down_nonevent = as.integer(df_NRI[df_NRI$y == 0,]$n_down),
+                   NRI_event = df_NRI[df_NRI$y == 1,]$nri,
+                   NRI_nonevent = df_NRI[df_NRI$y == 0,]$nri,
+                   IDI_event = df_IDI[df_IDI$y == 1,]$IDI,
+                   IDI_nonevent = df_IDI[df_IDI$y == 0,]$IDI,
+                   IP_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IP,
+                   IS_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IS,
+                   IP_new = df_model_Istats[df_model_Istats$Model == "New",]$IP, 
+                   IS_new = df_model_Istats[df_model_Istats$Model == "New",]$IS,
+                   Brier_baseline = df_Brier$brier_baseline,
+                   Brier_new = df_Brier$brier_new,
+                   Brier_skill = df_Brier$brier_skill,
+                   AUC_baseline = auc.x1,
+                   AUC_new = auc.x2,
+                   AUC_difference = auc.difference
+    )
+  }
+  if(NRI_return == FALSE ){
+    output <- list(n = n, 
+                   n_event = n_event, 
+                   n_non_event = n_non_event, 
+                   Prevalence = prevalence,
+                   IDI_event = df_IDI[df_IDI$y == 1,]$IDI,
+                   IDI_nonevent = df_IDI[df_IDI$y == 0,]$IDI,
+                   IP_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IP,
+                   IS_baseline = df_model_Istats[df_model_Istats$Model == "Baseline",]$IS,
+                   IP_new = df_model_Istats[df_model_Istats$Model == "New",]$IP, 
+                   IS_new = df_model_Istats[df_model_Istats$Model == "New",]$IS,
+                   Brier_baseline = df_Brier$brier_baseline,
+                   Brier_new = df_Brier$brier_new,
+                   Brier_skill = df_Brier$brier_skill,
+                   AUC_baseline = auc.x1,
+                   AUC_new = auc.x2,
+                   AUC_difference = auc.difference
+    )
+  }
+  
   return(output)
 }
 
@@ -1152,6 +1196,7 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
 #' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
 #' @param t The risk threshold(s) for groups. eg t<-c(0,0.1,1) is a two group model with a threshold of 0.1 & t<-c(0,0.1,0.3,1)  is a three group model with thresholds at 0.1 and 0.3.
+#' @param NRI_return If NRI statistics are required (default = FALSE).
 #' @param conf.level The confidence interval expressed as a fraction of 1 (ie 0.95 is the 95\% confidence interval )
 #' @param n.boot  The number of "bootstraps" to use. Performance slows down with more bootstraps. For trialling result, use a low number (eg 5), for accuracy use a large number (eg 2000)
 #' @param dp The number of decimal places to display
@@ -1195,41 +1240,48 @@ extract_NRI_CI <- function(results.boot, conf.level, n.boot, dp){
 #'output<-CI.raplot(x1, x2, y, t, conf.level = 0.95, n.boot = 5, dp = 2) 
 #'}
 #' @references  Pencina, M. J., D'Agostino, R. B., & Vasan, R. S. (2008). Evaluating the added stats::predictive ability of a new marker: From area under the ROC curve to reclassification and beyond. Statistics in Medicine, 27(2), 157–172. doi:10.1002/sim.2929
-CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 1000, dp = 3) {
+CI.raplot <- function(x1, x2 = NULL, y = NULL,  t = NULL, NRI_return = FALSE,  conf.level = 0.95, n.boot = 1000, dp = 3) {
   
   if (class(x1)[1] == "glm") {
     y = x1$y # must come first
     x1 = stats::predict(x1, type = "response")
     data_type = "glm"
   }
-  if (class(x2)[1] == "glm") {
+  if (!is.null(x2) & class(x2)[1] == "glm") {
     x2 = stats::predict(x2, type = "response")
   }
   if (class(x1)[1] == "lrm") {
-    x1 = stats::predict(x1, type = "fitted")
-    if (length(x1$y) == 0 ) {
+    y = x1$y # must come first
+    if (length(y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
-    y = x1$as.numeric(as.character(x1$y))
+    x1 = stats::predict(x1, type = "fitted")
     data_type = "lrm"
   }
-  if (class(x2)[1] == "lrm") {
+  if (!is.null(x2) & class(x2)[1] == "lrm") {
     if (length(x2$y) == 0 ) {
       stop("Fitted models with the rms package must be made using y = TRUE")
     }
     x2 = stats::predict(x2, type = "fitted")
   }
+  
+  if (length(x2) ==1) {
+    x2 = rep(x2,length(x1)) # If no x2 entered, then make the probability the value entered for all.
+  }
+  if (is.null(x2) ) {
+    x2 = rep(0.5,length(x1)) # If no x2 entered, then make the probability 0.5 for all.
+  }
   if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
     data_type = "User supplied"
   }
-  if (length(x1) != length(x2))
+  if (length(x1) != length(x2) )
     stop("Reference (baseline) and New (Alt) model vectors must be the same length")
   if (is.null(y))
     stop("Oops - there must be event data (y)")
   
   ifelse(is.null(t),
-         results <- statistics.raplot(x1, x2, y, t = NULL),  
-         results <- statistics.raplot(x1, x2, y,  t)
+         results <- statistics.raplot(x1, x2, y, t = NULL, NRI_return),  
+         results <- statistics.raplot(x1, x2, y,  t, NRI_return)
   )
   
   # Get results for each bootstrapped sample
@@ -1238,12 +1290,15 @@ CI.raplot <- function(x1, x2, y = NULL,  t = NULL,  conf.level = 0.95, n.boot = 
   for (i in 1:n.boot) {
     boot.index <- sample(length(y), replace = TRUE)
     risk.model1.boot <- x1[boot.index]
+    cc.status.boot <- y[boot.index]    
     risk.model2.boot <- x2[boot.index]
-    cc.status.boot <- y[boot.index]           
+    
     results.boot[[i]] <- statistics.raplot(x1 = risk.model1.boot, 
                                            x2 = risk.model2.boot, 
                                            y = cc.status.boot,
-                                           t)
+                                           t,
+                                           NRI_return)
+    
   }
   
   results.matrix <- extractCI(results.boot = results.boot, conf.level = conf.level, n.boot = n.boot, dp = dp)

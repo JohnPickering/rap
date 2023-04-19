@@ -1,7 +1,7 @@
 ---
 output: github_document
 author: John W Pickering
-date: 7 March 2023
+date: 19 April 2023
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -40,23 +40,36 @@ Version 1.03 were major changes:
 * provided as outputs in addition to the Risk Assessment Plot, a form of calibration plot and decision curve.  
 * the output from the main functions CI.raplot, and CI.classNRI are now lists that include the metrics for each bootstrap sample as well as the summary metrics. CI.classNRI also produces confusion matrices for those with and without the event of interest (separately). Bootstrapping is used to determine confidence intervals.  
  
-Version 1.10 (current):  
+Version 1.10 :  
 * addition of ROC plot. 
 * calibration plot now uses (best practice) continuous curves (the old format is now "ggcalibrate_original()").  
 * addition of precision recall curves.
 * all plots can be for one or two models.  
+
+Version 1.11 (current):  
+* made NRI metrics for models optional (use NRI_return = TRUE) to get them. 
+* changed behaviour to that "x2 = NULL" is possible for CI.raplot.  It has the effect of creating a model where every probability is 0.5.   
+* bug fix.  
+
 
 ## Example 1
 
 This is a basic example for assessing the difference between two logistic regression models:
 
 ```{r example1, warnings = FALSE, message=FALSE}
+library(dplyr)
 library(rap)
 ## basic example code
 
-baseline_risk <- data_risk$baseline    # or the baseline glm model itself
-new_risk <- data_risk$new              # or the new glm model itself
-outcome <- data_risk$outcome
+#### First make sure that data used has no missing values
+df <- data_risk %>% 
+  filter(!is.na(baseline))%>% 
+  filter(!is.na(new))%>% 
+  filter(!is.na(outcome))
+
+baseline_risk <- df$baseline    # or the baseline glm model itself
+new_risk <- df$new              # or the new glm model itself
+outcome <- df$outcome
 
 assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
                         n.boot = 20, dp = 2) # Note the default is 1000 bootstraps (n.boot = 1000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
@@ -88,6 +101,12 @@ ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
+### The original calibration curve
+```{r ggcalibrate_original, warning = FALSE, message = FALSE}
+ggcalibrate_original(x1 = baseline_risk, x2 = new_risk, y = outcome,  cut_type = "interval")
+
+```
+
 ### The decision curve
 ```{r ggdecision, warning = FALSE,message = FALSE}
 ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
@@ -102,7 +121,7 @@ ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ### The roc plot
 ```{r ggroc, warning = FALSE,message = FALSE}
-ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome)
+ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome, carrington_line = TRUE)
 
 ```
 

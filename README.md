@@ -1,5 +1,5 @@
 John W Pickering
-7 March 2023
+19 April 2023
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -56,11 +56,18 @@ summary metrics. CI.classNRI also produces confusion matrices for those
 with and without the event of interest (separately). Bootstrapping is
 used to determine confidence intervals.
 
-Version 1.10 (current):  
+Version 1.10 :  
 \* addition of ROC plot. \* calibration plot now uses (best practice)
 continuous curves (the old format is now “ggcalibrate_original()”).  
 \* addition of precision recall curves. \* all plots can be for one or
 two models.
+
+Version 1.11 (current):  
+\* made NRI metrics for models optional (use NRI_return = TRUE) to get
+them. \* changed behaviour to that “x2 = NULL” is possible for
+CI.raplot. It has the effect of creating a model where every probability
+is 0.5.  
+\* bug fix.
 
 ## Example 1
 
@@ -68,12 +75,19 @@ This is a basic example for assessing the difference between two
 logistic regression models:
 
 ``` r
+library(dplyr)
 library(rap)
 ## basic example code
 
-baseline_risk <- data_risk$baseline    # or the baseline glm model itself
-new_risk <- data_risk$new              # or the new glm model itself
-outcome <- data_risk$outcome
+#### First make sure that data used has no missing values
+df <- data_risk %>% 
+  filter(!is.na(baseline))%>% 
+  filter(!is.na(new))%>% 
+  filter(!is.na(outcome))
+
+baseline_risk <- df$baseline    # or the baseline glm model itself
+new_risk <- df$new              # or the new glm model itself
+outcome <- df$outcome
 
 assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
                         n.boot = 20, dp = 2) # Note the default is 1000 bootstraps (n.boot = 1000).  This can take quite some time to run, so when testing I use a smaller number of bootstraps.  
@@ -99,24 +113,6 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 #> 
 #> $Prevalence
 #> [1] 0.1986143
-#> 
-#> $NRI_up_event
-#> [1] 20
-#> 
-#> $NRI_up_nonevent
-#> [1] 19
-#> 
-#> $NRI_down_event
-#> [1] 13
-#> 
-#> $NRI_down_nonevent
-#> [1] 79
-#> 
-#> $NRI_event
-#> [1] 0.08139535
-#> 
-#> $NRI_nonevent
-#> [1] 0.1729107
 #> 
 #> $IDI_event
 #> [1] 0.1363479
@@ -156,20 +152,25 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 
 ## bootstrap derived metrics with confidence intervals  
 (assessment$Summary_metrics)
-#> # A tibble: 22 × 2
-#>    metric            statistics                  
-#>    <chr>             <chr>                       
-#>  1 n                 432 (CI: 427.9 to 440.52)   
-#>  2 n_event           88.5 (CI: 71.22 to 97.57)   
-#>  3 n_non_event       345.5 (CI: 333.42 to 361.15)
-#>  4 Prevalence        0.2 (CI: 0.16 to 0.23)      
-#>  5 NRI_up_event      19 (CI: 10.8 to 30.72)      
-#>  6 NRI_up_nonevent   19.5 (CI: 11.95 to 27.57)   
-#>  7 NRI_down_event    11 (CI: 6.48 to 18.1)       
-#>  8 NRI_down_nonevent 69.5 (CI: 51.9 to 101.07)   
-#>  9 NRI_event         0.09 (CI: 0 to 0.23)        
-#> 10 NRI_nonevent      0.15 (CI: 0.08 to 0.22)     
-#> # … with 12 more rows
+#> # A tibble: 16 × 2
+#>    metric         statistics                
+#>    <chr>          <chr>                     
+#>  1 n              433 (CI: 433 to 433)      
+#>  2 n_event        85 (CI: 72.38 to 104.62)  
+#>  3 n_non_event    348 (CI: 328.38 to 360.62)
+#>  4 Prevalence     0.2 (CI: 0.17 to 0.24)    
+#>  5 IDI_event      0.14 (CI: 0.11 to 0.18)   
+#>  6 IDI_nonevent   0.03 (CI: 0.02 to 0.05)   
+#>  7 IP_baseline    0.19 (CI: 0.18 to 0.2)    
+#>  8 IS_baseline    0.25 (CI: 0.24 to 0.27)   
+#>  9 IP_new         0.15 (CI: 0.13 to 0.17)   
+#> 10 IS_new         0.39 (CI: 0.36 to 0.44)   
+#> 11 Brier_baseline 0.15 (CI: 0.13 to 0.18)   
+#> 12 Brier_new      0.13 (CI: 0.1 to 0.16)    
+#> 13 Brier_skill    16.64 (CI: 9.98 to 26.78) 
+#> 14 AUC_baseline   0.68 (CI: 0.62 to 0.72)   
+#> 15 AUC_new        0.82 (CI: 0.76 to 0.86)   
+#> 16 AUC_difference 0.14 (CI: 0.1 to 0.2)
 ```
 
 ## Graphical assessments
@@ -195,6 +196,15 @@ ggcalibrate(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 <img src="man/figures/README-ggcalibrate-1.png" width="100%" />
 
+### The original calibration curve
+
+``` r
+ggcalibrate_original(x1 = baseline_risk, x2 = new_risk, y = outcome,  cut_type = "interval")
+#> $g
+```
+
+<img src="man/figures/README-ggcalibrate_original-1.png" width="100%" />
+
 ### The decision curve
 
 ``` r
@@ -214,7 +224,7 @@ ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
 ### The roc plot
 
 ``` r
-ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome)
+ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome, carrington_line = TRUE)
 ```
 
 <img src="man/figures/README-ggroc-1.png" width="100%" />
@@ -305,16 +315,16 @@ class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome
 ## bootstrap derived metrics with confidence intervals  
 (class_assessment$Summary_metrics)
 #> # A tibble: 10 × 2
-#>    metric            statistics                 
-#>    <chr>             <chr>                      
-#>  1 n                 444 (CI: 444 to 444)       
-#>  2 n_event           62.5 (CI: 51.38 to 75.1)   
-#>  3 n_non_event       381.5 (CI: 368.9 to 392.62)
-#>  4 Prevalence        0.14 (CI: 0.12 to 0.17)    
-#>  5 NRI_up_event      22 (CI: 14.48 to 31.57)    
-#>  6 NRI_up_nonevent   94.5 (CI: 78.8 to 103.1)   
-#>  7 NRI_down_event    5 (CI: 1.48 to 8)          
-#>  8 NRI_down_nonevent 73 (CI: 59.42 to 83.62)    
-#>  9 NRI_event         0.27 (CI: 0.16 to 0.42)    
-#> 10 NRI_nonevent      -0.05 (CI: -0.1 to -0.01)
+#>    metric            statistics                  
+#>    <chr>             <chr>                       
+#>  1 n                 444 (CI: 444 to 444)        
+#>  2 n_event           63.5 (CI: 50.42 to 73.57)   
+#>  3 n_non_event       380.5 (CI: 370.42 to 393.58)
+#>  4 Prevalence        0.14 (CI: 0.11 to 0.17)     
+#>  5 NRI_up_event      22 (CI: 16 to 28)           
+#>  6 NRI_up_nonevent   93.5 (CI: 76.28 to 110.15)  
+#>  7 NRI_down_event    4 (CI: 2 to 11)             
+#>  8 NRI_down_nonevent 69 (CI: 59.38 to 84)        
+#>  9 NRI_event         0.28 (CI: 0.17 to 0.39)     
+#> 10 NRI_nonevent      -0.06 (CI: -0.12 to 0)
 ```
