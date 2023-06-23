@@ -5,6 +5,8 @@
 \title{The Risk Assessment Plot}
 \usage{
 ggrap(x1, x2 = NULL, y = NULL)
+
+ggrap(x1, x2 = NULL, y = NULL)
 }
 \arguments{
 \item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or alculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
@@ -15,10 +17,14 @@ ggrap(x1, x2 = NULL, y = NULL)
 }
 \value{
 a ggplot
+
+a ggplot
 }
 \description{
 The function ggrap() plots the Sensitivity and 1-Specificity curves against the calculated risk for the baseline (reference) and newmodels, thus graphically displaying the IDIs for those with and without the events.  These plots can aid interpretation of the NRI and IDI metrics.
 }
 \references{
+The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
+
 The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
 }

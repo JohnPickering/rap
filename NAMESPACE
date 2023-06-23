@@ -2,10 +2,12 @@
 
 export(CI.classNRI)
 export(CI.raplot)
+export(anova_glm)
 export(extractCI)
 export(extract_NRI_CI)
 export(ggcalibrate)
 export(ggcalibrate_original)
+export(ggcontribute)
 export(ggdecision)
 export(ggprerec)
 export(ggrap)

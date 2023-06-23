@@ -16,13 +16,6 @@ ggcalibrate(x1, x2 = NULL, y = NULL, n_knots = 5, ci_level = 0.95)
 \item{n_knots}{The curves are made by fitting a restricted cubic spline (rms package). The default 5-knots is usually enough.}
 
 \item{ci_level}{Confidence interval of the curve (default = 0.95).}
-
-\item{models}{One of three strings:
-\itemize{
-\item{\strong{both}} {plot(s) will contain both the Baseline and New models;} 
-\item{\strong{x1}} {plot(s) will contain only the Baseline model;} 
-\item{\strong{x2}} {plot(s) will contain only the New model.}
-}}
 }
 \value{
 a ggplot

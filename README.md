@@ -77,13 +77,14 @@ logistic regression models:
 ``` r
 library(dplyr)
 library(rap)
+
 ## basic example code
 
 #### First make sure that data used has no missing values
 df <- data_risk %>% 
-  filter(!is.na(baseline))%>% 
-  filter(!is.na(new))%>% 
-  filter(!is.na(outcome))
+  dplyr::filter(!is.na(baseline))%>% 
+  dplyr::filter(!is.na(new))%>% 
+  dplyr::filter(!is.na(outcome))
 
 baseline_risk <- df$baseline    # or the baseline glm model itself
 new_risk <- df$new              # or the new glm model itself
@@ -153,24 +154,24 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 ## bootstrap derived metrics with confidence intervals  
 (assessment$Summary_metrics)
 #> # A tibble: 16 × 2
-#>    metric         statistics                
-#>    <chr>          <chr>                     
-#>  1 n              433 (CI: 433 to 433)      
-#>  2 n_event        85 (CI: 72.38 to 104.62)  
-#>  3 n_non_event    348 (CI: 328.38 to 360.62)
-#>  4 Prevalence     0.2 (CI: 0.17 to 0.24)    
-#>  5 IDI_event      0.14 (CI: 0.11 to 0.18)   
-#>  6 IDI_nonevent   0.03 (CI: 0.02 to 0.05)   
-#>  7 IP_baseline    0.19 (CI: 0.18 to 0.2)    
-#>  8 IS_baseline    0.25 (CI: 0.24 to 0.27)   
-#>  9 IP_new         0.15 (CI: 0.13 to 0.17)   
-#> 10 IS_new         0.39 (CI: 0.36 to 0.44)   
-#> 11 Brier_baseline 0.15 (CI: 0.13 to 0.18)   
-#> 12 Brier_new      0.13 (CI: 0.1 to 0.16)    
-#> 13 Brier_skill    16.64 (CI: 9.98 to 26.78) 
-#> 14 AUC_baseline   0.68 (CI: 0.62 to 0.72)   
-#> 15 AUC_new        0.82 (CI: 0.76 to 0.86)   
-#> 16 AUC_difference 0.14 (CI: 0.1 to 0.2)
+#>    metric         statistics                  
+#>    <chr>          <chr>                       
+#>  1 n              433 (CI: 433 to 433)        
+#>  2 n_event        84.5 (CI: 74.95 to 96.53)   
+#>  3 n_non_event    348.5 (CI: 336.48 to 358.05)
+#>  4 Prevalence     0.2 (CI: 0.17 to 0.22)      
+#>  5 IDI_event      0.14 (CI: 0.1 to 0.19)      
+#>  6 IDI_nonevent   0.04 (CI: 0.03 to 0.05)     
+#>  7 IP_baseline    0.19 (CI: 0.18 to 0.19)     
+#>  8 IS_baseline    0.25 (CI: 0.23 to 0.27)     
+#>  9 IP_new         0.15 (CI: 0.13 to 0.16)     
+#> 10 IS_new         0.39 (CI: 0.34 to 0.45)     
+#> 11 Brier_baseline 0.15 (CI: 0.14 to 0.17)     
+#> 12 Brier_new      0.12 (CI: 0.11 to 0.14)     
+#> 13 Brier_skill    20.41 (CI: 10.79 to 27.17)  
+#> 14 AUC_baseline   0.68 (CI: 0.64 to 0.74)     
+#> 15 AUC_new        0.83 (CI: 0.79 to 0.86)     
+#> 16 AUC_difference 0.15 (CI: 0.08 to 0.19)
 ```
 
 ## Graphical assessments
@@ -213,7 +214,7 @@ ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 <img src="man/figures/README-ggdecision-1.png" width="100%" />
 
-### The precission-recall curve
+### The precision-recall curve
 
 ``` r
 ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
@@ -232,6 +233,15 @@ ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome, carrington_line = TRUE)
 Note, there are additional options for the ROC plot including labelling
 points and distinguishing areas of the plot that are diagnostic from
 those that are not.
+
+### The contribution plot
+
+``` r
+load("inst/extdata/fit_example")
+ggcontribute(x1 = eg_fit.glm)
+```
+
+<img src="man/figures/README-ggcontribute-1.png" width="100%" />
 
 ## Example 2
 
@@ -315,16 +325,16 @@ class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome
 ## bootstrap derived metrics with confidence intervals  
 (class_assessment$Summary_metrics)
 #> # A tibble: 10 × 2
-#>    metric            statistics                  
-#>    <chr>             <chr>                       
-#>  1 n                 444 (CI: 444 to 444)        
-#>  2 n_event           63.5 (CI: 50.42 to 73.57)   
-#>  3 n_non_event       380.5 (CI: 370.42 to 393.58)
-#>  4 Prevalence        0.14 (CI: 0.11 to 0.17)     
-#>  5 NRI_up_event      22 (CI: 16 to 28)           
-#>  6 NRI_up_nonevent   93.5 (CI: 76.28 to 110.15)  
-#>  7 NRI_down_event    4 (CI: 2 to 11)             
-#>  8 NRI_down_nonevent 69 (CI: 59.38 to 84)        
-#>  9 NRI_event         0.28 (CI: 0.17 to 0.39)     
-#> 10 NRI_nonevent      -0.06 (CI: -0.12 to 0)
+#>    metric            statistics                 
+#>    <chr>             <chr>                      
+#>  1 n                 444 (CI: 444 to 444)       
+#>  2 n_event           61.5 (CI: 48.9 to 75.53)   
+#>  3 n_non_event       382.5 (CI: 368.48 to 395.1)
+#>  4 Prevalence        0.14 (CI: 0.11 to 0.17)    
+#>  5 NRI_up_event      23 (CI: 11.48 to 31)       
+#>  6 NRI_up_nonevent   88.5 (CI: 75.28 to 110.72) 
+#>  7 NRI_down_event    5 (CI: 3 to 7.52)          
+#>  8 NRI_down_nonevent 71.5 (CI: 62 to 84.53)     
+#>  9 NRI_event         0.3 (CI: 0.11 to 0.38)     
+#> 10 NRI_nonevent      -0.05 (CI: -0.11 to 0)
 ```

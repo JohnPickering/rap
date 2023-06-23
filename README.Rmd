@@ -59,13 +59,14 @@ This is a basic example for assessing the difference between two logistic regres
 ```{r example1, warnings = FALSE, message=FALSE}
 library(dplyr)
 library(rap)
+
 ## basic example code
 
 #### First make sure that data used has no missing values
 df <- data_risk %>% 
-  filter(!is.na(baseline))%>% 
-  filter(!is.na(new))%>% 
-  filter(!is.na(outcome))
+  dplyr::filter(!is.na(baseline))%>% 
+  dplyr::filter(!is.na(new))%>% 
+  dplyr::filter(!is.na(outcome))
 
 baseline_risk <- df$baseline    # or the baseline glm model itself
 new_risk <- df$new              # or the new glm model itself
@@ -113,7 +114,7 @@ ggdecision(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
 ```
 
-### The precission-recall curve
+### The precision-recall curve
 ```{r ggrerec, warning = FALSE,message = FALSE}
 ggprerec(x1 = baseline_risk, x2 = new_risk, y = outcome)
 
@@ -126,6 +127,13 @@ ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome, carrington_line = TRUE)
 ```
 
 Note, there are additional options for the ROC plot including labelling points and distinguishing areas of the plot that are diagnostic from those that are not.  
+
+### The contribution plot
+```{r ggcontribute, warning = FALSE,message = FALSE}
+load("inst/extdata/fit_example")
+ggcontribute(x1 = eg_fit.glm)
+
+```
 
 ## Example 2
 

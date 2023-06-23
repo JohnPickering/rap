@@ -4,7 +4,16 @@
 \alias{CI.raplot}
 \title{Statistical metrics with confidence intervals}
 \usage{
-CI.raplot(x1, x2, y = NULL, t = NULL, conf.level = 0.95, n.boot = 1000, dp = 3)
+CI.raplot(
+  x1,
+  x2 = NULL,
+  y = NULL,
+  t = NULL,
+  NRI_return = FALSE,
+  conf.level = 0.95,
+  n.boot = 1000,
+  dp = 3
+)
 }
 \arguments{
 \item{x1}{Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1}
@@ -14,6 +23,8 @@ CI.raplot(x1, x2, y = NULL, t = NULL, conf.level = 0.95, n.boot = 1000, dp = 3)
 \item{y}{Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE).}
 
 \item{t}{The risk threshold(s) for groups. eg t<-c(0,0.1,1) is a two group model with a threshold of 0.1 & t<-c(0,0.1,0.3,1)  is a three group model with thresholds at 0.1 and 0.3.}
+
+\item{NRI_return}{If NRI statistics are required (default = FALSE).}
 
 \item{conf.level}{The confidence interval expressed as a fraction of 1 (ie 0.95 is the 95\% confidence interval )}
 

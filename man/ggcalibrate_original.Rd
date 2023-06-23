@@ -30,13 +30,6 @@ ggcalibrate_original(
 }}
 
 \item{include_margin}{TRUE for including producing a bar plot of the counts of in each of the intervals. Default is FALSE.  Note if the output is saved to my_graphs then using the library gridExtra the function grid.arrange(graphs$g, graphs$g_marg , nrow = 2, heights = c(2,1)) will produce a plot with both the calibration plot and the marginal plot.}
-
-\item{models}{One of three strings:
-\itemize{
-\item{\strong{both}} {plot(s) will contain both the Baseline and New models;} 
-\item{\strong{x1}} {plot(s) will contain only the Baseline model;} 
-\item{\strong{x2}} {plot(s) will contain only the New model.}
-}}
 }
 \value{
 a list of one or two ggplots
@@ -51,6 +44,6 @@ y<-data_risk$outcome
 x1<-data_risk$baseline
 x2<-data_risk$new
 #e.g.
-output <- ggcalibrate(x1, x2, y, models = "both", n_cut = 10, cut_type = "number") 
+output <- ggcalibrate(x1, x2 = NULL , y = NULL,  n_cut = 5, cut_type = "interval", include_margin = FALSE) 
 }
 }

@@ -627,12 +627,6 @@ ggprerec <- function(x1, x2=NULL, y=NULL) {
 #' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1
 #' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
-#' @param models One of three strings:
-#' \itemize{
-#' \item{\strong{both}} {plot(s) will contain both the Baseline and New models;} 
-#' \item{\strong{x1}} {plot(s) will contain only the Baseline model;} 
-#' \item{\strong{x2}} {plot(s) will contain only the New model.}
-#' }
 #' @param n_knots The curves are made by fitting a restricted cubic spline (rms package). The default 5-knots is usually enough.  
 #' @param ci_level Confidence interval of the curve (default = 0.95).  
 #' @return a ggplot
@@ -758,12 +752,6 @@ ggcalibrate <- function(x1, x2 = NULL, y = NULL,  n_knots = 5, ci_level=0.95) {
 #' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1
 #' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
-#' @param models One of three strings:
-#' \itemize{
-#' \item{\strong{both}} {plot(s) will contain both the Baseline and New models;} 
-#' \item{\strong{x1}} {plot(s) will contain only the Baseline model;} 
-#' \item{\strong{x2}} {plot(s) will contain only the New model.}
-#' }
 #' @param n_cut An integer indicating either the number of intervals of the same width, the number of intervals of the same number of subjects, or the width (as a percentage) of the intervals.  
 #' @param cut_type One of three strings:
 #' \itemize{
@@ -788,7 +776,8 @@ ggcalibrate <- function(x1, x2 = NULL, y = NULL,  n_knots = 5, ci_level=0.95) {
 #' @import dplyr
 #' @importFrom pracma trapz
 #' @export
-ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = c("interval","number","width"), include_margin = FALSE) {
+ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, 
+                                 cut_type = c("interval","number","width"), include_margin = FALSE) {
   
   if (class(x1)[1] == "glm") {
     y = x1$y
@@ -933,8 +922,469 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
   return(output)
 }
 
+#'
+#' The function ggrap() plots the Sensitivity and 1-Specificity curves against the calculated risk for the baseline (reference) and newmodels, thus graphically displaying the IDIs for those with and without the events.  These plots can aid interpretation of the NRI and IDI metrics.
+#' 
+#' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package) or alculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1
+#' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
+#' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
+#' @return a ggplot 
+#' @references The Risk Assessment Plot in this form was described by Pickering, J. W., & Endre, Z. H. (2012). New Metrics for Assessing Diagnostic Potential of Candidate Biomarkers. Clinical Journal of the American Society of Nephrology, 7, 1355–1364. doi:10.2215/CJN.09590911
+#' @import ggplot2
+#' @import tidyr 
+#' @import dplyr
+#' @export
+#'
+ggrap <- function(x1, x2=NULL, y=NULL) {
+  
+  if (class(x1)[1] == "glm") {
+    y = x1$y
+    x1 = stats::predict(x1, type = "response")
+    data_type = "glm"
+  }
+  if (class(x2)[1] == "glm") {
+    x2 = stats::predict(x2, type = "response")
+  }
+  if (class(x1)[1] == "lrm") {
+    x1 = stats::predict(x1, type = "fitted")
+    if (length(x1$y) == 0 ) {
+      stop("Fitted models with the rms package must be made using y = TRUE")
+    }
+    y = x1$as.numeric(as.character(x1$y))
+    data_type = "lrm"
+  }
+  if (class(x2)[1] == "lrm") {
+    if (length(x2$y) == 0 ) {
+      stop("Fitted models with the rms package must be made using y = TRUE")
+    }
+    x2 = stats::predict(x2, type = "fitted")
+  }
+  
+  if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
+    data_type = "User supplied"
+  }
+  if (!is.null(x2) & length(x1) != length(x2))
+    stop("Reference (baseline) and New (Alt) model vectors must be the same length")
+  
+  
+  if(!is.null(x2)){
+    df <- data.frame(Baseline = x1, New = x2, Event = y)
+    df <- df |> 
+      filter(!is.na(Baseline)) |> 
+      filter(!is.na(New)) |> 
+      filter(!is.na(Event))
+    df$ID = seq(1,nrow(df),1)
+    
+    df_long <- df |> 
+      tidyr::pivot_longer(cols = c(Baseline,New), values_to = "Probabilities", names_to = "Model") |> 
+      group_by(Model)  |> 
+      arrange(Model, Probabilities) |> 
+      group_by(Model,Probabilities) |> 
+      reframe(n_event = sum(Event == 1),
+              n_nonevent = sum(Event == 0),
+              IDs = as.character(ID)) |> 
+      ungroup() |> 
+      group_by(Model) |> 
+      mutate(n_event_cumulative = cumsum(n_event)) |> 
+      mutate(n_nonevent_cumulative = cumsum(n_nonevent)) |> 
+      mutate(Sensitivity = (max(n_event_cumulative) - n_event_cumulative)/max(n_event_cumulative)) |> 
+      mutate(`1-Specificity` = (max(n_nonevent_cumulative) - n_nonevent_cumulative)/max(n_nonevent_cumulative)) |> 
+      ungroup()
+  }
+  
+  if(is.null(x2)){
+    df <- data.frame(Baseline = x1,  Event = y)
+    df <- df |> 
+      filter(!is.na(Baseline)) |> 
+      filter(!is.na(Event))
+    df$ID = seq(1,nrow(df),1)
+    
+    df_long <- df |> 
+      tidyr::pivot_longer(cols = c(Baseline), values_to = "Probabilities", names_to = "Model") |> 
+      group_by(Model)  |> 
+      arrange(Model, Probabilities) |> 
+      group_by(Model,Probabilities) |> 
+      reframe(n_event = sum(Event == 1),
+              n_nonevent = sum(Event == 0),
+              IDs = as.character(ID)) |> 
+      ungroup() |> 
+      group_by(Model) |> 
+      mutate(n_event_cumulative = cumsum(n_event)) |> 
+      mutate(n_nonevent_cumulative = cumsum(n_nonevent)) |> 
+      mutate(Sensitivity = (max(n_event_cumulative) - n_event_cumulative)/max(n_event_cumulative)) |> 
+      mutate(`1-Specificity` = (max(n_nonevent_cumulative) - n_nonevent_cumulative)/max(n_nonevent_cumulative)) |> 
+      ungroup()
+  }
+  
+  df_long_av <- df_long |> 
+    group_by(Model, Probabilities) |> 
+    summarise(Sensitivity = mean(Sensitivity),
+              `1-Specificity` = mean(`1-Specificity`),
+              ID_list = list(IDs)
+    ) |> 
+    ungroup()
+  
+  df_g <- df_long_av |> 
+    select(Probabilities, Sensitivity, `1-Specificity`, Model, ID_list) |>
+    tidyr::pivot_longer(cols = c(Sensitivity, `1-Specificity`), values_to = "Metric", names_to = "Metric name")
+  
+  
+  if(!is.null(x2)){
+    g <- ggplot(df_g, aes(x = Probabilities, y = Metric, colour = `Metric name`, linetype = Model )) + 
+      scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
+      scale_y_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) +
+      geom_line() +
+      scale_linetype_manual(values = c("dotted", "solid")) 
+  }
+  if(is.null(x2)){
+    g <- ggplot(df_g, aes(x = Probabilities, y = Metric, colour = `Metric name` )) + 
+      scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
+      scale_y_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) +
+      geom_line() 
+  }
+  
+  g <- g +
+    coord_cartesian(xlim = c(0,1), ylim = c(0,1))    
+  
+  return(g)
+}
+
+#' The Decision curve
+#' 
+#' ggdecision plots decision curves to assess the net benefit at different thresholds
+#' 
+#' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the baseline model.  Must be between 0 & 1
+#' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
+#' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
+#' @return a ggplot 
+#' @references Vickers AJ, van Calster B, Steyerberg EW. A simple, step-by-step guide to interpreting decision curve analysis. Diagn Progn Res 2019;3(1):18. 2. Zhang Z, Rousson V, Lee W-C, et al. Decision curve analysis: a technical note. Ann Transl Med 2018;6(15):308–308. 
+#' @import ggplot2
+#' @import tidyr
+#' @import dplyr
+#' @export
+#'
+ggdecision <- function(x1, x2=NULL, y=NULL) {
+  
+  if (class(x1)[1] == "glm") {
+    y = x1$y
+    x1 = stats::predict(x1, type = "response")
+    data_type = "glm"
+  }
+  if (class(x2)[1] == "glm") {
+    x2 = stats::predict(x2, type = "response")
+  }
+  if (class(x1)[1] == "lrm") {
+    x1 = stats::predict(x1, type = "fitted")
+    if (length(x1$y) == 0 ) {
+      stop("Fitted models with the rms package must be made using y = TRUE")
+    }
+    y = x1$as.numeric(as.character(x1$y))
+    data_type = "lrm"
+  }
+  if (class(x2)[1] == "lrm") {
+    if (length(x2$y) == 0 ) {
+      stop("Fitted models with the rms package must be made using y = TRUE")
+    }
+    x2 = stats::predict(x2, type = "fitted")
+  }
+  
+  if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) {
+    data_type = "User supplied"
+  }
+  if (!is.null(x2) & length(x1) != length(x2))
+    stop("Reference (baseline) and New (Alt) model vectors must be the same length")
+  
+  # Two lines
+  if(!is.null(x2)){
+    df <- data.frame(Baseline = x1, New = x2, Event = y)
+    df <- df |> 
+      filter(!is.na(Baseline)) |> 
+      filter(!is.na(New)) |> 
+      filter(!is.na(Event))
+    df$ID = seq(1,nrow(df),1)
+    
+    n <- nrow(df)
+    n_event = sum(df$Event)
+    n_nonevent = n - n_event
+    incidence <- 100 * n_event/n
+    
+    
+    # Net Benefit for Decision Curves
+    benefit.1 <- df |> 
+      mutate(Prediction = Baseline) |> 
+      group_by(Prediction) |> 
+      summarise(n_ev = sum(Event == 1),
+                n_nonev = sum(Event == 0)) |> 
+      ungroup() |> 
+      mutate(TP = n_event - cumsum(n_ev),
+             FN = n_event - TP, 
+             TN = cumsum(n_nonev),
+             FP = n_nonevent - TN,
+             prevalence = (TP + FN)/n,
+             sens = TP/(TP + FN),
+             spec = TN/(TN + FP),
+             `1-spec` = 1 - spec,
+             npv = TN/(TN + FN),
+             ppv = TP/(TP + FP),
+             treated = TP/n - (FP/n) * Prediction/(1 - Prediction),
+             untreated = TN/n - (FN/n) * (1 - Prediction)/Prediction,
+             overall = treated + untreated,
+             all = prevalence - (1 - prevalence)  * Prediction/(1 - Prediction),
+             Model = "Baseline"
+      )
+    
+    benefit.2 <- df |> 
+      mutate(Prediction = New) |> 
+      group_by(Prediction) |> 
+      summarise(n_ev = sum(Event == 1),
+                n_nonev = sum(Event == 0)) |> 
+      ungroup() |> 
+      mutate(TP = n_event - cumsum(n_ev),
+             FN = n_event - TP, 
+             TN = cumsum(n_nonev),
+             FP = n_nonevent - TN,
+             prevalence = (TP + FN)/n,
+             sens = TP/(TP + FN),
+             spec = TN/(TN + FP),
+             `1-spec` = 1 - spec,
+             npv = TN/(TN + FN),
+             ppv = TP/(TP + FP),
+             treated = TP/n - (FP/n) * Prediction/(1 - Prediction),
+             untreated = TN/n - (FN/n) * (1 - Prediction)/Prediction,
+             overall = treated + untreated,
+             all = prevalence - (1 - prevalence)  * Prediction/(1 - Prediction),
+             Model = "New"
+      )
+    
+    benefit = bind_rows(benefit.1, benefit.2)
+    
+    benefit_all_none <- benefit |> 
+      select(Prediction, all) |> 
+      mutate(none = 0)  |> 
+      tidyr::pivot_longer(cols = c("all", "none"), names_to = "Extreme models", values_to = "extremes") |> 
+      arrange(`Extreme models`)
+  }
+  
+  
+  # Pne lines
+  if(is.null(x2)){
+    df <- data.frame(Baseline = x1, Event = y)
+    df <- df |> 
+      filter(!is.na(Baseline)) |> 
+      filter(!is.na(Event))
+    df$ID = seq(1,nrow(df),1)
+    
+    n <- nrow(df)
+    n_event = sum(df$Event)
+    n_nonevent = n - n_event
+    incidence <- 100 * n_event/n
+    
+    
+    # Net Benefit for Decision Curves
+    benefit <- df |> 
+      mutate(Prediction = Baseline) |> 
+      group_by(Prediction) |> 
+      summarise(n_ev = sum(Event == 1),
+                n_nonev = sum(Event == 0)) |> 
+      ungroup() |> 
+      mutate(TP = n_event - cumsum(n_ev),
+             FN = n_event - TP, 
+             TN = cumsum(n_nonev),
+             FP = n_nonevent - TN,
+             prevalence = (TP + FN)/n,
+             sens = TP/(TP + FN),
+             spec = TN/(TN + FP),
+             `1-spec` = 1 - spec,
+             npv = TN/(TN + FN),
+             ppv = TP/(TP + FP),
+             treated = TP/n - (FP/n) * Prediction/(1 - Prediction),
+             untreated = TN/n - (FN/n) * (1 - Prediction)/Prediction,
+             overall = treated + untreated,
+             all = prevalence - (1 - prevalence)  * Prediction/(1 - Prediction),
+             Model = "Baseline"
+      )
+    
+    benefit_all_none <- benefit |> 
+      select(Prediction, all) |> 
+      mutate(none = 0)  |> 
+      tidyr::pivot_longer(cols = c("all", "none"), names_to = "Extreme models", values_to = "extremes") |> 
+      arrange(`Extreme models`)
+  }
+  
+  g <- ggplot() + 
+    scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
+    scale_y_continuous( expand = c(0.005,0.005)) + 
+    geom_point(data = benefit, aes(x = Prediction, y = treated, colour = Model), alpha = 0.3, size = 0.5) + 
+    geom_smooth(data = benefit, aes(x = Prediction, y = treated, colour = Model), se = FALSE) + 
+    geom_line(data = benefit_all_none, aes(x = Prediction, y = extremes, linetype = `Extreme models`)) +
+    ylab("Net benefit") + xlab("Prediction threshold") +
+    coord_cartesian(ylim = c(1.5 * min(benefit$treated), 1.05 * incidence/100)) +
+    NULL
+  return(g)
+}
 
 
+#' The Contribution plot
+#' 
+#' ggcontribute plots the contribution of each variable to the model
+#' 
+#' @param x1 Either a logistic regression fitted using glm (base package) or lrm (rms package)  of the baseline model. 
+#' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package)  of the new (alternative) model.  
+#' @param option_flag A flag to choose if the relative percentage of the Chi2-degrees of freedom are plotted.  
+#' @import ggplot2
+#' @import tidyr
+#' @import dplyr
+#' @export
+#'
+ggcontribute <- function(x1, x2 = NULL, option_flag = c("chi2","percent")){
+  
+  if (class(x1)[1] != "glm"  & class(x1)[1] != "lrm" ) { 
+    stop("Oops - there must be a glm or lrm fit for the first variable")
+  }
+  if (!is.null(x2) & class(x2)[1] != "glm"  & class(x2)[1] != "lrm" ) {
+    stop("Oops - there must be a glm or lrm fit for the second variable")
+  } 
+  if (class(x1)[1] == "glm") {
+    an1 <- anova_glm(x1)
+    data_type1 <- "glm"
+  }
+  if (class(x2)[1] == "glm") {
+    an2 <- anova_glm(x2)
+    data_type2 <- "glm"
+  }
+  if (class(x1)[1] == "lrm") {
+    an1 <- anova(x1)
+    data_type1  <- "lrm"
+  }
+  if (class(x2)[1] == "lrm") {
+    an2 <- anova(x2)
+    data_type1 <- "lrm"
+  }
+  if (length(option_flag) > 1){
+    option_flag <- "chi2"
+  }
+  
+  
+  base_anova <- as.data.frame(an1[1:nrow(an1)-1,]) |> 
+    mutate(variables= rownames(an1[1:nrow(an1)-1,])) |> 
+    mutate(Xsqmindf = `Chi-Square` - `d.f.`) |> 
+    arrange(-Xsqmindf) |> 
+    filter(variables != "TOTAL")  
+  
+  vars = row.names(base_anova) 
+  base_anova <- base_anova |> mutate(variables = vars)
+  
+  total.df <- sum(base_anova$Df)
+  total.Xsqmindf <- sum(base_anova$Xsqmindf)
+  base_anova <-  base_anova |> 
+    mutate(Xsqmindf.percent = 100*Xsqmindf/total.Xsqmindf) |> 
+    mutate(variables=factor(variables, levels=variables[order(Xsqmindf.percent)]))  |> 
+    mutate(Model = "Baseline")
+  
+  if(!is.null(x2)){
+    
+    new_anova <- as.data.frame(an2[1:nrow(an2)-1,]) |> 
+      mutate(variables= rownames(an2[1:nrow(an2)-1,])) |> 
+      mutate(Xsqmindf = `Chi-Square` - `d.f.`) |> 
+      arrange(-Xsqmindf) |> 
+      filter(variables != "TOTAL")  
+    
+    vars = row.names(new_anova) 
+    new_anova <- new_anova |> mutate(variables = vars)
+    
+    total.df <- sum(new_anova$Df)
+    total.Xsqmindf <- sum(new_anova$Xsqmindf)
+    new_anova <-  new_anova |> 
+      mutate(Xsqmindf.percent = 100*Xsqmindf/total.Xsqmindf) |> 
+      mutate(variables=factor(variables, levels=variables[order(Xsqmindf.percent)]))  |> 
+      mutate(Model = "New")
+    
+    combined_anova = bind_rows(base_anova, new_anova)
+    
+    if(option_flag != "percent"){
+      combined_anova_wide <- combined_anova |> 
+        pivot_wider(id_cols = variables, names_from = Model, values_from = Xsqmindf) |> 
+        filter(!is.na(Baseline))
+    }
+    
+    
+    if(option_flag == "percent"){
+      combined_anova_wide <- combined_anova |> 
+        pivot_wider(id_cols = variables, names_from = Model, values_from = Xsqmindf.percent) |> 
+        filter(!is.na(Baseline))
+    }
+  }
+  
+  
+  if(is.null(x2)){
+    
+    if(option_flag !="percent"){
+      g <- ggplot()+
+        geom_point(data = base_anova , aes(x=Xsqmindf, y=variables),size=4) +
+        ylab(NULL) +
+        xlab(expression(chi^{2}~{"-"}~df)) +
+        theme(panel.background = element_rect(fill=NA),
+              panel.grid.major.x = element_line(colour="grey70"),
+              axis.ticks = element_blank(),
+              axis.title.y = element_blank(),
+              legend.title = element_blank(),
+              legend.position = "bottom",
+              text = element_text(size=12))
+    }
+    if(option_flag == "percent"){
+      g <- ggplot() + 
+        geom_point(data = base_anova , aes(x=Xsqmindf.percent, y=variables),size=4) +
+        ylab(NULL) + 
+        xlab("Relative variable contribution to the model (%)") + 
+        scale_x_continuous(breaks=seq(0,100,5)) +
+        theme(panel.background = element_rect(fill=NA),
+              panel.grid.major.x = element_line(colour="grey70"),
+              axis.ticks = element_blank(),
+              axis.title.y = element_blank(),
+              legend.title = element_blank(),
+              legend.position = "bottom",
+              text = element_text(size=12))
+    }
+  }
+  
+  
+  if(!is.null(x2)){
+    
+    if(option_flag != "percent"){
+      
+      g <- ggplot()+
+        geom_point(data = combined_anova , aes(x=Xsqmindf, y=variables, colour = Model),size=4) +
+        geom_segment(data = combined_anova_wide, aes(x = Baseline, xend = New, y=variables, yend=variables), arrow = arrow(angle = 30, length = unit(0.15, "inches"),ends = "last", type = "open") ) +
+        ylab(NULL) +
+        xlab(expression(chi^{2}~{"-"}~df)) +
+        theme(panel.background = element_rect(fill=NA),
+              panel.grid.major.x = element_line(colour="grey70"),
+              axis.ticks = element_blank(),
+              axis.title.y = element_blank(),
+              legend.title = element_blank(),
+              legend.position = "bottom",
+              text = element_text(size=12))
+    } 
+    
+    if(option_flag == "percent"){
+      g <- ggplot() + 
+        geom_point(data = combined_anova , aes(x=Xsqmindf.percent, y=variables, colour = Model),size=4) +
+        geom_segment(data = combined_anova_wide, aes(x = Baseline, xend = New, y=variables, yend=variables), arrow = arrow(angle = 30, length = unit(0.15, "inches"),ends = "last", type = "open") ) +
+        ylab(NULL) +
+        xlab("Relative variable contribution to the model (%)") + 
+        scale_x_continuous(breaks=seq(0,100,5)) +
+        theme(panel.background = element_rect(fill=NA),
+              panel.grid.major.x = element_line(colour="grey70"),
+              axis.ticks = element_blank(),
+              axis.title.y = element_blank(),
+              legend.title = element_blank(),
+              legend.position = "bottom",
+              text = element_text(size=12)) 
+    }
+  }
+  
+  return(g)
+}
 
 
 #' Statistical metrics
@@ -945,6 +1395,7 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5, cut_type = 
 #' @param x2 Either a logistic regression fitted using glm (base package) or lrm (rms package) or calculated probabilities (eg through a logistic regression model) of the new (alternative) model.   Must be between 0 & 1
 #' @param y Binary of outcome of interest. Must be 0 or 1 (if fitted models are provided this is extracted from the fit which for an rms fit must have x = TRUE, y = TRUE). 
 #' @param  t The risk threshold(s) for groups. eg t<-c(0,0.1,1) is a two group scenario with a threshold of 0.1 & t<-c(0,0.1,0.3,1)  is a three group scenario with thresholds at 0.1 and 0.3. Nb. If no t is provided it defaults to a single threshold at the prevalence of the cohort.  
+#' @param  NRI_return Flag to return NRI metrics, default is FALSE.  
 #' @return A matrix of metrics for use within CI.raplot
 #' @import pROC
 #' @import dplyr
@@ -982,13 +1433,13 @@ statistics.raplot <- function(x1, x2, y,  t = NULL, NRI_return = FALSE) {
   if (is.null(t)) {t <- c(0, incidence/100,1) }
   
   # ROC
-  roc.1 <- roc(df$y, df$x1)
+  roc.1 <- pROC::roc(df$y, df$x1)
   auc.x1 <- as.numeric(auc(roc.1))
   df_model.1 = data.frame(sens = roc.1$sensitivities, spec = roc.1$specificities, Prediction = roc.1$thresholds)
   df_model.1 <- df_model.1 |> mutate(Model = "Baseline")
   
   
-  roc.2 <- roc(df$y, df$x2)
+  roc.2 <- pROC::roc(df$y, df$x2)
   auc.x2 <- as.numeric(auc(roc.2))
   auc.difference = auc.x2 - auc.x1
   df_model.2 = data.frame(sens = roc.2$sensitivities, spec = roc.2$specificities, Prediction = roc.2$thresholds)
@@ -1498,4 +1949,38 @@ CI.classNRI <- function(c1, c2, y, s1 = NULL, s2 = NULL,  conf.level = 0.95, n.b
   
   
   return(list(meta_data = meta_data, Metrics = results, Each_bootstrap_metrics = results.boot, Summary_metrics = results.matrix))
+}
+
+
+#' The function anova_glm() returns the Chi^2 and degrees of freedom for each variable & the same was anova.rms() does from lrm() in the rms package.
+#' @param f A logistic regression fit created using glm (base package) 
+#' @import tidyr 
+#' @import dplyr
+#' @export
+anova_glm <- function(f){
+  if (class(f)[1] != "glm") {
+    stop("The fit must be a binary logistic model created with glm()")
+  }
+  df <- as.data.frame(matrix(nrow=length(f[["model"]]) ,ncol=2))
+  rownames(df) = c(names(f[["model"]])[2:length(f[["model"]])],"TOTAL")
+  colnames(df) <- c("Chi-Square","d.f.")
+  total_deg_free = 0
+  for (i in 2:length(f[["model"]])){
+    deg_free <- length(levels(f[["model"]][[i]]))
+    deg_free <- ifelse(deg_free == 0, 1, deg_free -1)
+    var =stats::vcov(f)[(total_deg_free+2):(total_deg_free+deg_free+1),(total_deg_free+2):(total_deg_free+deg_free+1)]
+    coef=f[["coefficients"]][(total_deg_free+2):(total_deg_free+deg_free+1)]
+    df[i-1,1] <- coef %*% solve(var,coef)
+    df[i-1,2] <- deg_free
+    total_deg_free = total_deg_free + deg_free
+    
+  }
+  
+  total_deg_free <- sum(df[1:(nrow(df)-1),2])
+  df[nrow(df),2] <- total_deg_free
+  var = stats::vcov(f)[2:(total_deg_free+1),2:(total_deg_free+1)]
+  coef=f[["coefficients"]][2:(total_deg_free+1)]
+  df[nrow(df),1] <- coef %*% solve(var,coef)
+  
+  return(df)
 }
