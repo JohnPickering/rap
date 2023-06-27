@@ -1,5 +1,5 @@
 John W Pickering
-23 June 2023
+27 June 2023
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -154,24 +154,24 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 ## bootstrap derived metrics with confidence intervals  
 (assessment$Summary_metrics)
 #> # A tibble: 16 × 2
-#>    metric         statistics                  
-#>    <chr>          <chr>                       
-#>  1 n              433 (CI: 433 to 433)        
-#>  2 n_event        84.5 (CI: 74.95 to 96.53)   
-#>  3 n_non_event    348.5 (CI: 336.48 to 358.05)
-#>  4 Prevalence     0.2 (CI: 0.17 to 0.22)      
-#>  5 IDI_event      0.14 (CI: 0.1 to 0.19)      
-#>  6 IDI_nonevent   0.04 (CI: 0.03 to 0.05)     
-#>  7 IP_baseline    0.19 (CI: 0.18 to 0.19)     
-#>  8 IS_baseline    0.25 (CI: 0.23 to 0.27)     
-#>  9 IP_new         0.15 (CI: 0.13 to 0.16)     
-#> 10 IS_new         0.39 (CI: 0.34 to 0.45)     
-#> 11 Brier_baseline 0.15 (CI: 0.14 to 0.17)     
-#> 12 Brier_new      0.12 (CI: 0.11 to 0.14)     
-#> 13 Brier_skill    20.41 (CI: 10.79 to 27.17)  
-#> 14 AUC_baseline   0.68 (CI: 0.64 to 0.74)     
-#> 15 AUC_new        0.83 (CI: 0.79 to 0.86)     
-#> 16 AUC_difference 0.15 (CI: 0.08 to 0.19)
+#>    metric         statistics                 
+#>    <chr>          <chr>                      
+#>  1 n              433 (CI: 433 to 433)       
+#>  2 n_event        83.5 (CI: 72.47 to 103.1)  
+#>  3 n_non_event    349.5 (CI: 329.9 to 360.52)
+#>  4 Prevalence     0.19 (CI: 0.17 to 0.24)    
+#>  5 IDI_event      0.14 (CI: 0.11 to 0.18)    
+#>  6 IDI_nonevent   0.04 (CI: 0.02 to 0.05)    
+#>  7 IP_baseline    0.19 (CI: 0.18 to 0.2)     
+#>  8 IS_baseline    0.25 (CI: 0.24 to 0.26)    
+#>  9 IP_new         0.15 (CI: 0.13 to 0.16)    
+#> 10 IS_new         0.4 (CI: 0.36 to 0.43)     
+#> 11 Brier_baseline 0.15 (CI: 0.13 to 0.17)    
+#> 12 Brier_new      0.12 (CI: 0.1 to 0.14)     
+#> 13 Brier_skill    20.46 (CI: 12.6 to 26.52)  
+#> 14 AUC_baseline   0.66 (CI: 0.64 to 0.72)    
+#> 15 AUC_new        0.83 (CI: 0.79 to 0.87)    
+#> 16 AUC_difference 0.15 (CI: 0.12 to 0.19)
 ```
 
 ## Graphical assessments
@@ -328,13 +328,13 @@ class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome
 #>    metric            statistics                 
 #>    <chr>             <chr>                      
 #>  1 n                 444 (CI: 444 to 444)       
-#>  2 n_event           61.5 (CI: 48.9 to 75.53)   
-#>  3 n_non_event       382.5 (CI: 368.48 to 395.1)
+#>  2 n_event           61.5 (CI: 49.9 to 73.53)   
+#>  3 n_non_event       382.5 (CI: 370.48 to 394.1)
 #>  4 Prevalence        0.14 (CI: 0.11 to 0.17)    
-#>  5 NRI_up_event      23 (CI: 11.48 to 31)       
-#>  6 NRI_up_nonevent   88.5 (CI: 75.28 to 110.72) 
-#>  7 NRI_down_event    5 (CI: 3 to 7.52)          
-#>  8 NRI_down_nonevent 71.5 (CI: 62 to 84.53)     
-#>  9 NRI_event         0.3 (CI: 0.11 to 0.38)     
-#> 10 NRI_nonevent      -0.05 (CI: -0.11 to 0)
+#>  5 NRI_up_event      21 (CI: 15.95 to 25.05)    
+#>  6 NRI_up_nonevent   94 (CI: 77.47 to 108.62)   
+#>  7 NRI_down_event    4 (CI: 1 to 8.05)          
+#>  8 NRI_down_nonevent 67.5 (CI: 59 to 86.53)     
+#>  9 NRI_event         0.27 (CI: 0.15 to 0.38)    
+#> 10 NRI_nonevent      -0.07 (CI: -0.12 to 0.01)
 ```
