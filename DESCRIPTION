@@ -1,6 +1,6 @@
 Package: rap
 Title: Risk Assessment Plot and reclassification metrics
-Version: 1.20
+Version: 1.21
 Authors@R: "John W Pickering <John.Pickering@otago.ac.nz>[aut, cre]"
 Description: A package for assessing the comparative performance of two logistic regression models or results of such models or classification models. Discrimination metrics Integrated Discrimination Improvement (IDI), Net Reclassification Improvement (NRI), Difference in AUCs, Brier scores and Brier skill. Plots include:  Risk Assessment Plots, Decision curves and Calibration plots.  
 Depends:
