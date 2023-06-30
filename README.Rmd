@@ -33,7 +33,7 @@ devtools::install_github("JohnPickering/rap")
 
 ## History and versions
 
-rap began as Matlab code in 2012 after I wrote a paper ([1](https://cjasn.asnjournals.org/content/7/8/1355){target="_blank"}) for the Nephrology community on assessing the added value of one biomarker to a clinical prediction model. I worked with Professor Zoltan Endre on that paper.  Dr David Cairns kindly provided some R code for the Risk Assessment Plot.  This formed the basis of versions 0.1 to 0.4. Importantly, for those versions and the current version all errors are mine (sorry) and not those of Professor Endre or Dr Cairns. Since writing that paper I've come to consider some metrics as not helpful.  So, for the current version I have dropped some statistical metrics that I believe are poor or wrongly applied.  In particularly, I dropped providing the total NRI (Net Reclassification Improvement) and total IDI (Integrated Discrimination Improvement) metrics.  These should never be presented because they inappropriately add together two fractions with differing denominators (NRI) or two means (IDI).  Instead, these the NRIs and IDIs for those with and without the event of interest should be provided. Third, I have provided the change in AUCs rather than a p-value because the change is much more meaningful. 
+rap began as Matlab code in 2012 after I wrote a paper ([1](https://cjasn.asnjournals.org/content/7/8/1355){target="_blank"}) for the Nephrology community on assessing the added value of one biomarker to a clinical prediction model. I worked with Professor Zoltan Endre on that paper.  Dr David Cairns kindly provided some R code for the Risk Assessment Plot.  This formed the basis of versions 0.1 to 0.4. Importantly, for those versions and the current version all errors are mine (sorry) and not those of Professor Endre or Dr Cairns. Since writing that paper I've come to consider some metrics as not helpful.  So, for the current version I have dropped some statistical metrics that I believe are poor or wrongly applied.  In particularly, I dropped providing the total NRI (Net Reclassification Improvement) and total IDI (Integrated Discrimination Improvement) metrics.  These should never be presented because they inappropriately add together two fractions with differing denominators (NRI) or two means (IDI).  Instead, these the NRIs and IDIs for those with and without the event of interest should be provided. Third, I have provided the change in AUCs rather than a p-value because the change is much more meaningful.  
 
 Version 1.03 were major changes:  
 * allowed as input logistic regression models from glm (stats) and lrm (rms) as well as risk predictions calculated elsewhere.
@@ -52,7 +52,8 @@ Version 1.11:
 * bug fix.  
 
 Version 1.22 (current):  
-* addition of ggcontribute graph.  
+* addition of ggcontribute graph.
+* changed from  geom_line to the geom_step for the ROC plot (because it represents the data better).   
 * bug fix.  
 
 ## Example 1

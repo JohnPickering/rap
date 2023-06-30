@@ -812,7 +812,7 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5,
   
   
   if (!is.null(x2)){
-  df <- data.frame(Baseline = x1, New = x2, Event = y)
+    df <- data.frame(Baseline = x1, New = x2, Event = y)
   }
   if (is.null(x2)){
     df <- data.frame(Baseline = x1, Event = y)
@@ -828,13 +828,13 @@ ggcalibrate_original <- function(x1, x2 = NULL, y = NULL, n_cut = 5,
   
   # Calibration
   if (!is.null(x2)){
-      df_long <- df %>% 
-    tidyr::pivot_longer(cols = c(Baseline,New), values_to = "prediction", names_to = "Model") %>% 
-    select(Model,Event, prediction) %>% # or whatever your outcome and predictions are
-    mutate(prediction = 100 * as.numeric(prediction)) %>%  # If prediciton is in the 0-1 range I prefer it in the 0-100 range
-    filter(!is.na(prediction)) 
+    df_long <- df %>% 
+      tidyr::pivot_longer(cols = c(Baseline,New), values_to = "prediction", names_to = "Model") %>% 
+      select(Model,Event, prediction) %>% # or whatever your outcome and predictions are
+      mutate(prediction = 100 * as.numeric(prediction)) %>%  # If prediciton is in the 0-1 range I prefer it in the 0-100 range
+      filter(!is.na(prediction)) 
   }
-
+  
   if (is.null(x2)){
     df_long <- df %>% 
       tidyr::pivot_longer(cols = c(Baseline), values_to = "prediction", names_to = "Model") %>% 
@@ -1489,7 +1489,7 @@ statistics.raplot <- function(x1, x2, y,  t = NULL, NRI_return = FALSE) {
       brier_skill = 100 * (brier_baseline - brier_new)/brier_baseline
     )
   df_model = bind_rows(df_model.1, df_model.2) 
-
+  
   df_model <- df_model |> 
     mutate(Prediction = ifelse(sens == 1 & spec == 0, 0, ifelse(sens == 0 & spec == 1, 1, Prediction) ))
   
