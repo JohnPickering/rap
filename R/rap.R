@@ -440,6 +440,7 @@ ggroc <- function(x1, x2=NULL, y=NULL,  carrington_line = FALSE, costs = c(0,0,1
     
     roc_df = bind_rows(roc.1, roc.2)
   }
+  roc_df <- roc_df |> arrange(Model, sens, `1-spec` )
   
   g <- ggplot(data = roc_df) + 
     scale_x_continuous(breaks = seq(0,1,0.1), expand = c(0.005,0.005)) + 
@@ -455,9 +456,8 @@ ggroc <- function(x1, x2=NULL, y=NULL,  carrington_line = FALSE, costs = c(0,0,1
   } 
   
   g <- g +
-    geom_line( aes(x = `1-spec`, y = sens, colour = Model)) + 
-    geom_point(aes(x = `1-spec`, y = sens, colour = Model)) +
-    NULL
+    geom_step( aes(x = `1-spec`, y = sens, colour = Model)) + 
+    geom_point(aes(x = `1-spec`, y = sens, colour = Model)) 
   
   if(!is.null(label_number)){
     labs <- roc_df |> 

@@ -46,11 +46,14 @@ Version 1.10 :
 * addition of precision recall curves.
 * all plots can be for one or two models.  
 
-Version 1.11 (current):  
+Version 1.11:  
 * made NRI metrics for models optional (use NRI_return = TRUE) to get them. 
 * changed behaviour to that "x2 = NULL" is possible for CI.raplot.  It has the effect of creating a model where every probability is 0.5.   
 * bug fix.  
 
+Version 1.22 (current):  
+* addition of ggcontribute graph.  
+* bug fix.  
 
 ## Example 1
 
@@ -129,6 +132,9 @@ ggroc(x1 = baseline_risk, x2 = new_risk, y = outcome, carrington_line = TRUE)
 Note, there are additional options for the ROC plot including labelling points and distinguishing areas of the plot that are diagnostic from those that are not.  
 
 ### The contribution plot
+
+Thanks to Professor Frank Harrell for these plots.  
+
 ```{r ggcontribute, warning = FALSE,message = FALSE}
 load("inst/extdata/fit_example")
 ggcontribute(x1 = eg_fit.glm)

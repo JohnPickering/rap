@@ -62,11 +62,15 @@ continuous curves (the old format is now “ggcalibrate_original()”).
 \* addition of precision recall curves. \* all plots can be for one or
 two models.
 
-Version 1.11 (current):  
+Version 1.11:  
 \* made NRI metrics for models optional (use NRI_return = TRUE) to get
 them. \* changed behaviour to that “x2 = NULL” is possible for
 CI.raplot. It has the effect of creating a model where every probability
 is 0.5.  
+\* bug fix.
+
+Version 1.22 (current):  
+\* addition of ggcontribute graph.  
 \* bug fix.
 
 ## Example 1
@@ -157,21 +161,21 @@ assessment <- CI.raplot(x1 = baseline_risk, x2 = new_risk, y = outcome,
 #>    metric         statistics                 
 #>    <chr>          <chr>                      
 #>  1 n              433 (CI: 433 to 433)       
-#>  2 n_event        83.5 (CI: 72.47 to 103.1)  
-#>  3 n_non_event    349.5 (CI: 329.9 to 360.52)
-#>  4 Prevalence     0.19 (CI: 0.17 to 0.24)    
-#>  5 IDI_event      0.14 (CI: 0.11 to 0.18)    
-#>  6 IDI_nonevent   0.04 (CI: 0.02 to 0.05)    
-#>  7 IP_baseline    0.19 (CI: 0.18 to 0.2)     
-#>  8 IS_baseline    0.25 (CI: 0.24 to 0.26)    
-#>  9 IP_new         0.15 (CI: 0.13 to 0.16)    
-#> 10 IS_new         0.4 (CI: 0.36 to 0.43)     
-#> 11 Brier_baseline 0.15 (CI: 0.13 to 0.17)    
+#>  2 n_event        83.5 (CI: 69.47 to 96.1)   
+#>  3 n_non_event    349.5 (CI: 336.9 to 363.52)
+#>  4 Prevalence     0.19 (CI: 0.16 to 0.22)    
+#>  5 IDI_event      0.13 (CI: 0.11 to 0.16)    
+#>  6 IDI_nonevent   0.03 (CI: 0.02 to 0.04)    
+#>  7 IP_baseline    0.18 (CI: 0.17 to 0.19)    
+#>  8 IS_baseline    0.25 (CI: 0.24 to 0.27)    
+#>  9 IP_new         0.15 (CI: 0.14 to 0.17)    
+#> 10 IS_new         0.38 (CI: 0.36 to 0.43)    
+#> 11 Brier_baseline 0.14 (CI: 0.13 to 0.16)    
 #> 12 Brier_new      0.12 (CI: 0.1 to 0.14)     
-#> 13 Brier_skill    20.46 (CI: 12.6 to 26.52)  
-#> 14 AUC_baseline   0.66 (CI: 0.64 to 0.72)    
-#> 15 AUC_new        0.83 (CI: 0.79 to 0.87)    
-#> 16 AUC_difference 0.15 (CI: 0.12 to 0.19)
+#> 13 Brier_skill    16.87 (CI: 9.06 to 23.69)  
+#> 14 AUC_baseline   0.7 (CI: 0.63 to 0.75)     
+#> 15 AUC_new        0.82 (CI: 0.77 to 0.86)    
+#> 16 AUC_difference 0.13 (CI: 0.08 to 0.17)
 ```
 
 ## Graphical assessments
@@ -235,6 +239,8 @@ points and distinguishing areas of the plot that are diagnostic from
 those that are not.
 
 ### The contribution plot
+
+Thanks to Professor Frank Harrell for these plots.
 
 ``` r
 load("inst/extdata/fit_example")
@@ -325,16 +331,16 @@ class_assessment <- CI.classNRI(c1 = baseline_class, c2 = new_class, y = outcome
 ## bootstrap derived metrics with confidence intervals  
 (class_assessment$Summary_metrics)
 #> # A tibble: 10 × 2
-#>    metric            statistics                 
-#>    <chr>             <chr>                      
-#>  1 n                 444 (CI: 444 to 444)       
-#>  2 n_event           61.5 (CI: 49.9 to 73.53)   
-#>  3 n_non_event       382.5 (CI: 370.48 to 394.1)
-#>  4 Prevalence        0.14 (CI: 0.11 to 0.17)    
-#>  5 NRI_up_event      21 (CI: 15.95 to 25.05)    
-#>  6 NRI_up_nonevent   94 (CI: 77.47 to 108.62)   
-#>  7 NRI_down_event    4 (CI: 1 to 8.05)          
-#>  8 NRI_down_nonevent 67.5 (CI: 59 to 86.53)     
-#>  9 NRI_event         0.27 (CI: 0.15 to 0.38)    
-#> 10 NRI_nonevent      -0.07 (CI: -0.12 to 0.01)
+#>    metric            statistics                  
+#>    <chr>             <chr>                       
+#>  1 n                 444 (CI: 444 to 444)        
+#>  2 n_event           62.5 (CI: 49.48 to 82.82)   
+#>  3 n_non_event       381.5 (CI: 361.17 to 394.52)
+#>  4 Prevalence        0.14 (CI: 0.11 to 0.19)     
+#>  5 NRI_up_event      23 (CI: 12.95 to 31.05)     
+#>  6 NRI_up_nonevent   95.5 (CI: 77.7 to 109.53)   
+#>  7 NRI_down_event    6 (CI: 2 to 8)              
+#>  8 NRI_down_nonevent 70 (CI: 57.33 to 83.05)     
+#>  9 NRI_event         0.26 (CI: 0.12 to 0.41)     
+#> 10 NRI_nonevent      -0.07 (CI: -0.12 to 0)
 ```
